@@ -12,9 +12,4 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="4.0.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Business\" />
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
 </Project>

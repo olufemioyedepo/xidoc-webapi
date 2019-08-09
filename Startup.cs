@@ -27,7 +27,7 @@ namespace GeofencingWebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new Info { Title = "Geofencing Web Api", Description = "Description goes here..." });
+                c.SwaggerDoc("v1", new Info { Title = "CODIX Geofencing Web Api", Description = "" });
             }
             );
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

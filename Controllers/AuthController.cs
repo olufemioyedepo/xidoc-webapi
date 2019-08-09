@@ -5,7 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using GeofencingWebApi.Models.WebResponse;
+using GeofencingWebApi.Models.ODataResponse;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -17,14 +17,14 @@ namespace GeofencingWebApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        IConfiguration _configuration;
+        readonly IConfiguration _configuration;
         public AuthController(IConfiguration configuration)
         {
             _configuration = configuration;
         }
 
         [HttpGet]
-        [Route("gettoken")]
+        [Route("token")]
         public IActionResult Authenticate()
         {
             var authResponse = new AuthResponse();
