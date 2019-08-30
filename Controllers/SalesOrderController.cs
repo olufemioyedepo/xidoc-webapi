@@ -82,5 +82,23 @@ namespace GeofencingWebApi.Controllers
 
             return Ok(salesOrderTypes);
         }
+
+        [HttpPost]
+        [Route("cancel")]
+        public IActionResult CancelSalesOrder(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        {
+            var authOperation = new AuthOperations(_configuration);
+
+            bool tokenExpired = authOperation.TokenExpired(salesOrderNumberWithToken.Token);
+
+            if (tokenExpired)
+            {
+                return BadRequest("Authentication token has expired!");
+            }
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            string response = salesOrderOperations.CancelSalesOrder(salesOrderNumberWithToken);
+
+            return Ok(response);
+        }
     }
 }

@@ -15,7 +15,7 @@ namespace GeofencingWebApi.Business
     public class SalesOrderOperations
     {
         readonly IConfiguration _configuration;
-        private string salesordercreate;
+        private string salesordercreate, salesordercancel;
         private string salesorderbypersonnelnumber;
         private string jsonResponse;
 
@@ -23,6 +23,7 @@ namespace GeofencingWebApi.Business
         {
             _configuration = configuration;
             salesordercreate = _configuration.GetSection("Endpoints").GetSection("salesordercreate").Value;
+            salesordercancel = _configuration.GetSection("Endpoints").GetSection("salesordercancel").Value;
             salesorderbypersonnelnumber = _configuration.GetSection("Endpoints").GetSection("salesorderbypersonnelnumber").Value;
         }
 
@@ -118,6 +119,35 @@ namespace GeofencingWebApi.Business
             }
 
             return salesOrderResponseList;
+        }
+
+        public string CancelSalesOrder(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        {
+            var helper = new Helper(_configuration);
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + salesordercancel;
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(currentEnvironment);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrderNumberWithToken.Token);
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                var salesOrderNumber = new SalesOrderNumbeForSave()
+                {
+                    SalesOrderNumber = salesOrderNumberWithToken.SalesOrderNumber
+                };
+
+                HttpResponseMessage responseMessage = client.PostAsJsonAsync(url, salesOrderNumber).Result;
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                return "success";
+            }
         }
     }
 }
