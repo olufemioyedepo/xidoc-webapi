@@ -22,7 +22,7 @@ namespace GeofencingWebApi.Models.ODataResponse
     public class Item
     {
         public string ProductNumber { get; set; }
-        public string ProductType { get; set; }
+        // public string ProductType { get; set; }
         public string ProductName { get; set; }
     }
 }

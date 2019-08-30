@@ -24,6 +24,15 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(SalesOrder salesOrderInfo)
         {
+            var authOperation = new AuthOperations(_configuration);
+
+            bool tokenExpired = authOperation.TokenExpired(salesOrderInfo.Token);
+
+            if (tokenExpired)
+            {
+                return BadRequest("Authentication token has expired!");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");
@@ -41,19 +50,37 @@ namespace GeofencingWebApi.Controllers
         }
 
         [HttpPost]
-        [Route("agentid")]
-        public IActionResult GetSalesOrderByAgentId(AgentIdWithToken agentIdWithToken)
+        [Route("personnelnumber")]
+        public IActionResult GetSalesOrderByAgentId(StaffPersonnelWithToken agentIdWithToken)
         {
+            var authOperation = new AuthOperations(_configuration);
+
+            bool tokenExpired = authOperation.TokenExpired(agentIdWithToken.Token);
+
+            if (tokenExpired)
+            {
+                return BadRequest("Authentication token has expired!");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");
             }
 
             var salesOrderOperations = new SalesOrderOperations(_configuration);
-            var salesOrderResponse = salesOrderOperations.GetSalesOrderByCreatorId(agentIdWithToken);
+            var salesOrderResponse = salesOrderOperations.GetSalesOrderByPersonnelNumber(agentIdWithToken);
 
             return Ok(salesOrderResponse);
         }
 
+        [HttpGet]
+        [Route("types")]
+        public IActionResult GetSalesOrderTypes()
+        {
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            var salesOrderTypes = salesOrderOperations.GetSalesOrderTypes();
+
+            return Ok(salesOrderTypes);
+        }
     }
 }

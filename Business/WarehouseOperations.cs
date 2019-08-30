@@ -30,7 +30,7 @@ namespace GeofencingWebApi.Business
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + warehousesendpoint;
 
-            var warehousesResponse = new WarehouseResponse();
+            
             var warehousesResponseList = new List<Warehouse>();
 
             try
@@ -46,6 +46,8 @@ namespace GeofencingWebApi.Business
                     {
                         using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
                         {
+                            var warehousesResponse = new WarehouseResponse();
+
                             jsonResponse = sr.ReadToEnd();
                             warehousesResponse = JsonConvert.DeserializeObject<WarehouseResponse>(jsonResponse);
                             warehousesResponseList = warehousesResponse.value;

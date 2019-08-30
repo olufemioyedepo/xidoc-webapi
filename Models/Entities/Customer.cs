@@ -16,20 +16,21 @@ namespace GeofencingWebApi.Models.Entities
         [Required]
         public string CustGroup { get; set; }
 
-        [Required]
-        public string Currency { get; set; }
+        // public string Currency { get; set; }
 
         /// <summary>
         /// The User ID of the Agent creating the Customer
         /// </summary>
-        [Required]
-        public Double CreatorId { get; set; } // User ID of agent creating the customer entity
+        public double CreatorId { get; set; } // User ID of agent creating the customer entity
 
         /// <summary>
         /// JWT Bearer Token 
         /// </summary>
         [Required]
         public string Token { get; set; }
+
+        [Required]
+        public string PersonnelNumber { get; set; }
 
         /// <summary>
         /// 
@@ -58,8 +59,10 @@ namespace GeofencingWebApi.Models.Entities
         [Required]
         public string Currency { get; set; }
 
+        public double CreatorId { get; set; } // User ID of agent creating the customer entity
+
         [Required]
-        public Double CreatorId { get; set; } // User ID of agent creating the customer entity
+        public string PersonnelNumber { get; set; }
 
         [MaxLength(255)]
         public string Phone { get; set; } // dirPartyContactInfo.Locator 

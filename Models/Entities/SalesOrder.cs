@@ -21,8 +21,11 @@ namespace GeofencingWebApi.Models.Entities
         /// <summary>
         /// The User ID of the Agent raising the Sales Order
         /// </summary>
+        //[Required]
+        //public string CreatorId { get; set; }
+        
         [Required]
-        public string CreatorId { get; set; }
+        public string StaffPersonnelNumber { get; set; }
 
         public string SalesName { get; set; }
         /// <summary>
@@ -67,13 +70,18 @@ namespace GeofencingWebApi.Models.Entities
     public class SalesOrderForSave
     {
         public DateTime DateTimeCreated { get; set; }
+        [Required]
         public string CustAccount { get; set; }
         public string CreatorId { get; set; }
+        [Required]
+        public string StaffPersonnelNumber { get; set; }
         public string SalesName { get; set; }
         public string SalesType { get; set; }
         //public string InventSiteId { get; set; }
         //public string InventLocationId { get; set; }
+        [Required]
         public string SalesAgentLongitude { get; set; }
+        [Required]
         public string SalesAgentLatitude { get; set; }
         //public string Token { get; set; }
     }

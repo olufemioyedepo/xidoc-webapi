@@ -16,14 +16,14 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private string salesordercreate;
-        private string salesorderbyagentid;
+        private string salesorderbypersonnelnumber;
         private string jsonResponse;
 
         public SalesOrderOperations(IConfiguration configuration)
         {
             _configuration = configuration;
             salesordercreate = _configuration.GetSection("Endpoints").GetSection("salesordercreate").Value;
-            salesorderbyagentid = _configuration.GetSection("Endpoints").GetSection("salesorderbyagent").Value;
+            salesorderbypersonnelnumber = _configuration.GetSection("Endpoints").GetSection("salesorderbypersonnelnumber").Value;
         }
 
         public SalesOrderResponse Save(SalesOrder salesOrder)
@@ -40,11 +40,13 @@ namespace GeofencingWebApi.Business
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrder.Token);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
+                var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
+
                 var salesOrderForSave = new SalesOrderForSave()
                 {
                     CustAccount = salesOrder.CustAccount,
-                    CreatorId = salesOrder.CreatorId,
-                    DateTimeCreated = DateTime.Now,
+                    StaffPersonnelNumber = salesOrder.StaffPersonnelNumber,
+                    DateTimeCreated = dateTimeCreated,
                     SalesAgentLatitude = salesOrder.SalesAgentLatitude,
                     SalesAgentLongitude = salesOrder.SalesAgentLongitude,
                     SalesName = salesOrder.SalesName,
@@ -62,15 +64,30 @@ namespace GeofencingWebApi.Business
             }
         }
 
-        public List<SalesOrderItem> GetSalesOrderByCreatorId(AgentIdWithToken agentIdWithToken)
+        public SalesOrderTypes[] GetSalesOrderTypes()
+        {
+            SalesOrderTypes[] salesOrderTypes =
+            {
+                new SalesOrderTypes { Value = "Journal"},
+                new SalesOrderTypes { Value = "Quotation"},
+                new SalesOrderTypes { Value = "Subscription"},
+                new SalesOrderTypes { Value = "Sales order"},
+                new SalesOrderTypes { Value = "Returned order"},
+                new SalesOrderTypes { Value = "Item requirements"},
+            };
+
+            return salesOrderTypes;
+        }
+
+        public List<SalesOrderItem> GetSalesOrderByPersonnelNumber(StaffPersonnelWithToken agentIdWithToken)
         {
             var helper = new Helper(_configuration);
 
             string currentEnvironment = helper.GetEnvironmentUrl();
-            string url = currentEnvironment + salesorderbyagentid;
-            string formattedUrl = String.Format(url, agentIdWithToken.CreatorId);
+            string url = currentEnvironment + salesorderbypersonnelnumber;
+            string formattedUrl = String.Format(url, agentIdWithToken.PersonnelNumber);
 
-            var salesOrdersResponse = new SalesOrderResponse();
+            
             var salesOrderResponseList = new List<SalesOrderItem>();
 
             try
@@ -86,6 +103,8 @@ namespace GeofencingWebApi.Business
                     {
                         using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
                         {
+                            var salesOrdersResponse = new SalesOrderResponse();
+
                             jsonResponse = sr.ReadToEnd();
                             salesOrdersResponse = JsonConvert.DeserializeObject<SalesOrderResponse>(jsonResponse);
                             salesOrderResponseList = salesOrdersResponse.value;

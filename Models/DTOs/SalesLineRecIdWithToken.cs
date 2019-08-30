@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.DTOs
 {
-    public class AgentIdWithToken
+    public class SalesLineRecIdWithToken
     {
-        [Required]
-        public Int64 CreatorId { get; set; }
-        [Required]
+        public long SalesLineRecId { get; set; }
         public string Token { get; set; }
+    }
+
+    public class SalesLineRecIdForSave
+    {
+        public long SalesLineRecId { get; set; }
     }
 }

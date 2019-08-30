@@ -23,6 +23,15 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(Customer customerInfo)
         {
+            var authOperation = new AuthOperations(_configuration);
+
+            bool tokenExpired = authOperation.TokenExpired(customerInfo.Token);
+
+            if (tokenExpired)
+            {
+                return BadRequest("Authentication token has expired!");
+            }
+
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");

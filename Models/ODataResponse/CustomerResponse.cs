@@ -18,6 +18,7 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string AccountNum { get; set; }
         public string CustGroup { get; set; }
         public string Currency { get; set; }
-        public Double CreatorId {get; set; }
+        public string StaffPersonnelNumber { get; set; }
+        //public double CreatorId {get; set; }
     }
 }

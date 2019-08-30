@@ -14,7 +14,8 @@ namespace GeofencingWebApi.Models.ODataResponse
         public double SalesQty { get; set; }
         public DateTime DateTimeCreated { get; set; }
         public double LineDisc { get; set; }
-        public string CreatorId { get; set; }
+        //public string CreatorId { get; set; }
+        public string StaffPersonnelNumber { get; set; }
         public string Warehouse { get; set; }
         public string ItemId { get; set; }
         public string SalesAgentLongitude { get; set; }
@@ -33,6 +34,8 @@ namespace GeofencingWebApi.Models.ODataResponse
         public double SalesPrice { get; set; }
         public double LineAmount { get; set; }
         public int OrderedSalesQuantity { get; set; }
+        public long SalesLineRecId { get; set; }
+
     }
 
     public class SalesLineListResponse

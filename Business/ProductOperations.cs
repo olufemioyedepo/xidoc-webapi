@@ -15,15 +15,15 @@ namespace GeofencingWebApi.Business
     public class ProductOperations
     {
         readonly IConfiguration _configuration;
-        private string products;
-        private string jsonResponse;
+        private string jsonResponse, products, productscount, pagedproducts;
 
         public ProductOperations(IConfiguration configuration)
         {
             _configuration = configuration;
             products = _configuration.GetSection("Endpoints").GetSection("products").Value;
+            pagedproducts = _configuration.GetSection("Endpoints").GetSection("pagedproducts").Value;
+            productscount = _configuration.GetSection("Endpoints").GetSection("productscount").Value;
         }
-
 
         public List<Item> GetProducts(Token token)
         {
@@ -32,8 +32,6 @@ namespace GeofencingWebApi.Business
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + products;
             
-
-            var productsResponse = new ProductsResponse();
             var productsResponseList = new List<Item>();
 
             try
@@ -49,6 +47,8 @@ namespace GeofencingWebApi.Business
                     {
                         using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
                         {
+                            var productsResponse = new ProductsResponse();
+
                             jsonResponse = sr.ReadToEnd();
                             productsResponse = JsonConvert.DeserializeObject<ProductsResponse>(jsonResponse);
                             productsResponseList = productsResponse.value;
@@ -63,5 +63,87 @@ namespace GeofencingWebApi.Business
 
             return productsResponseList;
         }
+
+        public long GetProductsCount(Token token)
+        {
+            var helper = new Helper(_configuration);
+
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + productscount;
+
+            long productCountResponse = 0;
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token.Value);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            jsonResponse = sr.ReadToEnd();
+                            productCountResponse = JsonConvert.DeserializeObject<long>(jsonResponse);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return productCountResponse;
+        }
+
+        public List<Item> GetPagedProducts(PagedProduct pagedProduct)
+        {
+            var helper = new Helper(_configuration);
+            const int resultperpage = 20;
+            int currentPage = pagedProduct.Page;
+            int skipCount = currentPage * resultperpage;
+
+            //$skip=20&$top=20
+            string formattedproducts = string.Format(pagedproducts, skipCount, resultperpage); 
+
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + formattedproducts;
+
+            var productsResponseList = new List<Item>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + pagedProduct.Token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var productsResponse = new ProductsResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            productsResponse = JsonConvert.DeserializeObject<ProductsResponse>(jsonResponse);
+                            productsResponseList = productsResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            return productsResponseList;
+        }
+
     }
 }

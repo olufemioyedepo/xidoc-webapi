@@ -40,7 +40,8 @@ namespace GeofencingWebApi.Business
                     AccountNum = customerInfo.AccountNum,
                     City = customerInfo.City,
                     CreatorId = customerInfo.CreatorId,
-                    Currency = customerInfo.Currency,
+                    PersonnelNumber = customerInfo.PersonnelNumber,
+                    Currency = "NGN", //customerInfo.Currency,
                     CustGroup = customerInfo.CustGroup,
                     Location = customerInfo.Location,
                     Phone = customerInfo.Phone,
@@ -56,6 +57,19 @@ namespace GeofencingWebApi.Business
 
                 return responseMessage.Content.ReadAsAsync<CustomerResponse>().Result;
             }
+        }
+
+        public CustomerGroup[] GetCustomerGroups()
+        {
+            CustomerGroup[] customerGroups =
+            {
+                new CustomerGroup { Name = "Employee", Value = "EMP"},
+                new CustomerGroup { Name = "Institutions", Value = "INST"},
+                new CustomerGroup { Name = "Retail Customers", Value = "RETAIL"},
+                new CustomerGroup { Name = "Walkin Customer", Value = "WALKIN"},
+            };
+
+            return customerGroups;
         }
     }
 }

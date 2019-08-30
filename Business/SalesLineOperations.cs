@@ -9,19 +9,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace GeofencingWebApi.Business
 {
     public class SalesLineOperations
     {
         readonly IConfiguration _configuration;
-        private readonly string saleslinecreate, saleslinebyordernumber;
+        private readonly string saleslinecreate, saleslinecancel, saleslinebyordernumber;
         private string jsonResponse;
 
         public SalesLineOperations(IConfiguration configuration)
         {
             _configuration = configuration;
             saleslinecreate = _configuration.GetSection("Endpoints").GetSection("saleslinecreate").Value;
+            saleslinecancel = _configuration.GetSection("Endpoints").GetSection("saleslinecancel").Value;
             saleslinebyordernumber = _configuration.GetSection("Endpoints").GetSection("saleslinebyordernumber").Value;
         }
 
@@ -37,13 +39,15 @@ namespace GeofencingWebApi.Business
                 client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesLine.Token);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
+                var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
+
                 var salesLineForSave = new SalesLineForSave()
                 {
                     SalesId = salesLine.SalesId,
-                    CreatorId = salesLine.CreatorId,
+                    PersonnelNumber = salesLine.PersonnelNumber,
                     Warehouse = salesLine.Warehouse,
                     ItemId = salesLine.ItemId,
-                    DateTimeCreated = DateTime.Now,
+                    DateTimeCreated = dateTimeCreated,
                     LineDisc = salesLine.LineDisc,
                     SalesAgentLatitude = salesLine.SalesAgentLatitude,
                     SalesAgentLongitude = salesLine.SalesAgentLongitude,
@@ -61,7 +65,7 @@ namespace GeofencingWebApi.Business
             }
         }
 
-        public List<SalesLineListItem> GetSalesLineBySalesOrderNumber(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        public List<SalesLineListItem> GetSalesLinesBySalesOrderNumber(SalesOrderNumberWithToken salesOrderNumberWithToken)
         {
             var helper = new Helper(_configuration);
 
@@ -69,7 +73,7 @@ namespace GeofencingWebApi.Business
             string url = currentEnvironment + saleslinebyordernumber;
             string formattedUrl = String.Format(url, salesOrderNumberWithToken.SalesOrderNumber);
 
-            var salesLinesResponse = new SalesLineListResponse();
+            
             var saleLineResponseList = new List<SalesLineListItem>();
 
             try
@@ -85,6 +89,8 @@ namespace GeofencingWebApi.Business
                     {
                         using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
                         {
+                            var salesLinesResponse = new SalesLineListResponse();
+
                             jsonResponse = sr.ReadToEnd();
                             salesLinesResponse = JsonConvert.DeserializeObject<SalesLineListResponse>(jsonResponse);
                             saleLineResponseList = salesLinesResponse.value;
@@ -98,6 +104,35 @@ namespace GeofencingWebApi.Business
             }
 
             return saleLineResponseList;
+        }
+
+        public string CancelSalesLine(SalesLineRecIdWithToken salesLineRecIdWithToken)
+        {
+            var helper = new Helper(_configuration);
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + saleslinecancel;
+
+            using (var client = new HttpClient())
+            {
+                client.BaseAddress = new Uri(currentEnvironment);
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesLineRecIdWithToken.Token);
+                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                var salesLineRecId = new SalesLineRecIdForSave()
+                {
+                    SalesLineRecId = salesLineRecIdWithToken.SalesLineRecId
+                };
+
+                HttpResponseMessage responseMessage = client.PostAsJsonAsync(url, salesLineRecId).Result;
+
+                if (!responseMessage.IsSuccessStatusCode)
+                {
+                    return null;
+                }
+
+                return "success";
+            }
         }
     }
 }

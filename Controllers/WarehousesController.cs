@@ -23,6 +23,15 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(Token authToken)
         {
+            var authOperation = new AuthOperations(_configuration);
+
+            bool tokenExpired = authOperation.TokenExpired(authToken.Value);
+
+            if (tokenExpired)
+            {
+                return BadRequest("Authentication token has expired!");
+            }
+
             var warehouseOperations = new WarehouseOperations(_configuration);
             var warehouseResponse = warehouseOperations.GetWarehouses(authToken);
 

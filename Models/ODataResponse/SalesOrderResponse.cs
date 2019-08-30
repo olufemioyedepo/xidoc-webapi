@@ -30,6 +30,6 @@ namespace GeofencingWebApi.Models.ODataResponse
         // public string CustAccount { get; set; }
         //public string SalesName { get; set; }
         //public string SalesType { get; set; }
-        public string CreatorId { get; set; }
+        public string PersonnelNumber { get; set; }
     }
 }
