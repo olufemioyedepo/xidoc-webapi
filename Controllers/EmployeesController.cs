@@ -21,25 +21,11 @@ namespace GeofencingWebApi.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
-        public IActionResult Post(Token token)
+        [HttpGet]
+        public IActionResult Get()
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(token.Value);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Authentication token is missing!");
-            }
-
             var employeeOperations = new EmployeeOperations(_configuration);
-            var employeeResponse = employeeOperations.GetEmployees(token);
+            var employeeResponse = employeeOperations.GetEmployees();
 
             return Ok(employeeResponse);
         }

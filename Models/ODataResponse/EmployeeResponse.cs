@@ -32,4 +32,29 @@ namespace GeofencingWebApi.Models.ODataResponse
         public float CommissionPercentageRate { get; set; }
         public string AgentLocation { get; set; }
     }
+
+    public class Worker
+    {
+        [JsonProperty("@odata.etag")]
+        public string etag { get; set; }
+        public string PersonnelNumber { get; set; }
+        public string LastName { get; set; }
+        public string FirstName { get; set; }
+        public string Name { get; set; }
+        public string PrimaryContactEmail { get; set; }
+        public string SalesAgentLongitude { get; set; }
+        public string SalesAgentLatitude { get; set; }
+        public float CoverageRadius { get; set; }
+        public float OutOfCoverargeLimit { get; set; }
+        public float CommissionPercentageRate { get; set; }
+        public string AgentLocation { get; set; }
+    }
+
+    public class WorkerResponse
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+        [JsonProperty("value")]
+        public List<Worker> value { get; set; }
+    }
 }

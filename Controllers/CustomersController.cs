@@ -23,14 +23,12 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(Customer customerInfo)
         {
-            var authOperation = new AuthOperations(_configuration);
+            //bool tokenExpired = authOperation.TokenExpired(customerInfo.Token);
 
-            bool tokenExpired = authOperation.TokenExpired(customerInfo.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
+            //if (tokenExpired)
+            //{
+            //    return BadRequest("Authentication token has expired!");
+            //}
 
             if (!ModelState.IsValid)
             {
@@ -38,6 +36,8 @@ namespace GeofencingWebApi.Controllers
             }
 
             var customerOperations = new CustomerOperations(_configuration);
+
+            // customerInfo.Token = token;
             var customerResponse = customerOperations.Save(customerInfo);
 
             if (customerResponse == null)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.Entities
 {
-    public class Employee
+    public class SalesAgent
     {
         public string Name { get; set; }
         public string PersonnelNumber { get; set; }

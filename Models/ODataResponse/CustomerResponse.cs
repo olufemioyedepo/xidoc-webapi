@@ -15,10 +15,11 @@ namespace GeofencingWebApi.Models.ODataResponse
         //public string etag { get; set; }
 
         //public string dataAreaId { get; set; }
-        public string AccountNum { get; set; }
+        //public string AccountNum { get; set; }
         public string CustGroup { get; set; }
         public string Currency { get; set; }
-        public string StaffPersonnelNumber { get; set; }
+        public string PersonnelNumber { get; set; }
+        public string Name { get; set; }
         //public double CreatorId {get; set; }
     }
 }

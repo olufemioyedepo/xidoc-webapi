@@ -25,7 +25,9 @@ namespace GeofencingWebApi.Business
         public CustomerResponse Save(Customer customerInfo)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             // url = currentEnvironment + endpoint;
 
@@ -33,15 +35,16 @@ namespace GeofencingWebApi.Business
             {
                 client.BaseAddress = new Uri(currentEnvironment);
                 client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + customerInfo.Token);
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 var customerForSave = new CustomerForSave() {
-                    AccountNum = customerInfo.AccountNum,
+                    //AccountNum = customerInfo.AccountNum,
                     City = customerInfo.City,
-                    CreatorId = customerInfo.CreatorId,
+                    Name = customerInfo.Name,
+                    //CreatorId = customerInfo.CreatorId,
                     PersonnelNumber = customerInfo.PersonnelNumber,
-                    Currency = "NGN", //customerInfo.Currency,
+                    Currency = customerInfo.Currency, //"NGN",
                     CustGroup = customerInfo.CustGroup,
                     Location = customerInfo.Location,
                     Phone = customerInfo.Phone,

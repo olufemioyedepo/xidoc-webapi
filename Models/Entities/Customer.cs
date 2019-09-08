@@ -8,26 +8,34 @@ namespace GeofencingWebApi.Models.Entities
 {
     public class Customer
     {
-        [Required]
-        public string AccountNum { get; set; }
+        //[Required]
+        //public string AccountNum { get; set; }
 
         // Will be a dropdown box with the following options (CONT => Contract Staff, DIST => Distributions)
         // EMP => Employee, INST => Institutions, RETAIL => Retail Customers, WALKIN => Walkin Customer
         [Required]
         public string CustGroup { get; set; }
 
-        // public string Currency { get; set; }
+        [Required]
+        [MaxLength(100, ErrorMessage = "Customer Name cannot exceed 100 characters!")]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// currencode from /api/currencies eg. NGN, USD
+        /// </summary>
+        [Required]
+        public string Currency { get; set; }
 
         /// <summary>
         /// The User ID of the Agent creating the Customer
         /// </summary>
-        public double CreatorId { get; set; } // User ID of agent creating the customer entity
+        // public double CreatorId { get; set; } // User ID of agent creating the customer entity
 
         /// <summary>
         /// JWT Bearer Token 
         /// </summary>
-        [Required]
-        public string Token { get; set; }
+        //[Required]
+        //public string Token { get; set; }
 
         [Required]
         public string PersonnelNumber { get; set; }
@@ -36,6 +44,7 @@ namespace GeofencingWebApi.Models.Entities
         /// 
         /// </summary>
         [MaxLength(255)]
+        [Required]
         public string Phone { get; set; } // dirPartyContactInfo.Locator 
 
         [MaxLength(60, ErrorMessage = "Location cannot exceed 60 characters")]
@@ -50,8 +59,8 @@ namespace GeofencingWebApi.Models.Entities
 
     public class CustomerForSave
     {
-        [Required]
-        public string AccountNum { get; set; }
+        //[Required]
+        //public string AccountNum { get; set; }
 
         [Required]
         public string CustGroup { get; set; }
@@ -59,7 +68,10 @@ namespace GeofencingWebApi.Models.Entities
         [Required]
         public string Currency { get; set; }
 
-        public double CreatorId { get; set; } // User ID of agent creating the customer entity
+        [Required]
+        public string Name { get; set; }
+
+        // public double CreatorId { get; set; } // User ID of agent creating the customer entity
 
         [Required]
         public string PersonnelNumber { get; set; }

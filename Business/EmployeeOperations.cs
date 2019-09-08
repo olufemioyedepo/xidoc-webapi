@@ -26,9 +26,12 @@ namespace GeofencingWebApi.Business
             salesagents = _configuration.GetSection("Endpoints").GetSection("salesagents").Value;
         }
 
-        public List<EmployeeWorker> GetEmployees(Token authToken)
+        public List<EmployeeWorker> GetEmployees()
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + employees;
 
@@ -40,7 +43,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + authToken.Value);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
