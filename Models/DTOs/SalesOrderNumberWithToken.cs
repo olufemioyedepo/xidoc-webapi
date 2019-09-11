@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.DTOs
 {
-    public class SalesOrderNumberWithToken
+    public class SalesOrderNumber
     {
         [Required]
-        public string Token { get; set; }
-        [Required]
-        public string SalesOrderNumber { get; set; }
+        public string OrdrderNumber { get; set; }
     }
 
     public class SalesOrderNumbeForSave

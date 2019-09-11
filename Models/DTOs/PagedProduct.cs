@@ -7,7 +7,7 @@ namespace GeofencingWebApi.Models.DTOs
 {
     public class PagedProduct
     {
-        public string Token { get; set; }
+        //public string Token { get; set; }
         public int Page { get; set; }
     }
 }

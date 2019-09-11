@@ -9,9 +9,9 @@ namespace GeofencingWebApi.Models.DTOs
     public class SalesLineRecIdWithToken
     {
         [Required]
-        public long SalesLineRecId { get; set; }
-        [Required]
-        public string Token { get; set; }
+        public long SalesLineId { get; set; }
+        //[Required]
+        //public string Token { get; set; }
     }
 
     public class SalesLineRecIdForSave

@@ -85,18 +85,10 @@ namespace GeofencingWebApi.Controllers
 
         [HttpPost]
         [Route("cancel")]
-        public IActionResult CancelSalesOrder(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        public IActionResult CancelSalesOrder(SalesOrderNumber salesOrderNumber)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesOrderNumberWithToken.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
             var salesOrderOperations = new SalesOrderOperations(_configuration);
-            string response = salesOrderOperations.CancelSalesOrder(salesOrderNumberWithToken);
+            string response = salesOrderOperations.CancelSalesOrder(salesOrderNumber);
 
             return Ok(response);
         }

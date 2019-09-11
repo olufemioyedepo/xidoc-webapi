@@ -28,16 +28,14 @@ namespace GeofencingWebApi.Models.ODataResponse
         public float OutOfCoverageLimit { get; set; }
         public float CommissionPercentageRate { get; set; }
         public string AgentLocation { get; set; }
-        [Required]
-        public string Token { get; set; }
+        //[Required]
+        //public string Token { get; set; }
     }
 
     public class RemoveSalesAgentPayload
     {
         [Required]
         public string PersonnelNumber { get; set; }
-        [Required]
-        public string Token { get; set; }
     }
 
     public class SalesAgentForSave

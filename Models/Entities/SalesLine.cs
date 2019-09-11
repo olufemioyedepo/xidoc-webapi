@@ -18,8 +18,6 @@ namespace GeofencingWebApi.Models.Entities
         [Required]
         public string Warehouse { get; set; }
         public string ItemId { get; set; }
-        [Required]
-        public string Token { get; set; }
         //[Required]
         //public string CreatorId { get; set; }
         [Required]

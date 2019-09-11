@@ -4,6 +4,7 @@ using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,10 +26,12 @@ namespace GeofencingWebApi.Business
             productscount = _configuration.GetSection("Endpoints").GetSection("productscount").Value;
         }
 
-        public List<Item> GetProducts(Token token)
+        public List<Item> GetProducts()
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + products;
             
@@ -41,7 +44,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + token.Value);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -58,16 +61,18 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return productsResponseList;
         }
 
-        public long GetProductsCount(Token token)
+        public long GetProductsCount()
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + productscount;
 
@@ -80,7 +85,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + token.Value);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -94,17 +99,21 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return productCountResponse;
         }
 
-        public List<Item> GetPagedProducts(PagedProduct pagedProduct)
+        public List<Item> GetPagedProducts(int pageNumber)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+
             const int resultperpage = 20;
-            int currentPage = pagedProduct.Page;
+            int currentPage = pageNumber; // pagedProduct.Page;
             int skipCount = currentPage * resultperpage;
 
             //$skip=20&$top=20
@@ -122,7 +131,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + pagedProduct.Token);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -139,7 +148,7 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return productsResponseList;

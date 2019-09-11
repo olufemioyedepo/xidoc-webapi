@@ -2,6 +2,8 @@
 using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +15,15 @@ namespace GeofencingWebApi.Business
     public class CustomerOperations
     {
         readonly IConfiguration _configuration;
-        private readonly string endpoint;
+        private readonly string endpoint, customergroups;
+        private string jsonResponse;
         //private string url;
 
         public CustomerOperations(IConfiguration configuration)
         {
             _configuration = configuration;
             endpoint = _configuration.GetSection("Endpoints").GetSection("createcustomer").Value;
+            customergroups = _configuration.GetSection("Endpoints").GetSection("customergroups").Value;
         }
 
         public CustomerResponse Save(Customer customerInfo)
@@ -62,17 +66,45 @@ namespace GeofencingWebApi.Business
             }
         }
 
-        public CustomerGroup[] GetCustomerGroups()
+        public List<CustomerGroup> GetCustomerGroups()
         {
-            CustomerGroup[] customerGroups =
-            {
-                new CustomerGroup { Name = "Employee", Value = "EMP"},
-                new CustomerGroup { Name = "Institutions", Value = "INST"},
-                new CustomerGroup { Name = "Retail Customers", Value = "RETAIL"},
-                new CustomerGroup { Name = "Walkin Customer", Value = "WALKIN"},
-            };
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
-            return customerGroups;
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + customergroups;
+
+            var customerGroupResponseList = new List<CustomerGroup>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var customerGroupsResponse = new CustomerGroupResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            customerGroupsResponse = JsonConvert.DeserializeObject<CustomerGroupResponse>(jsonResponse);
+                            customerGroupResponseList = customerGroupsResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return customerGroupResponseList;
         }
     }
 }

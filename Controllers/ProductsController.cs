@@ -20,25 +20,11 @@ namespace GeofencingWebApi.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
-        public IActionResult Post(Token token)
+        [HttpGet]
+        public IActionResult GetProducts()
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(token.Value);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Authentication token is missing!");
-            }
-
             var productOperations = new ProductOperations(_configuration);
-            var productResponse = productOperations.GetProducts(token);
+            var productResponse = productOperations.GetProducts();
 
             return Ok(productResponse);
         }
@@ -46,48 +32,25 @@ namespace GeofencingWebApi.Controllers
 
         [HttpPost]
         [Route("count")]
-        public IActionResult ProductCount(Token token)
+        public IActionResult ProductCount()
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(token.Value);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Authentication token is missing!");
-            }
-
             var productOperations = new ProductOperations(_configuration);
-            var productsCount = productOperations.GetProductsCount(token);
+            var productsCount = productOperations.GetProductsCount();
 
             return Ok(productsCount);
         }
 
-        [HttpPost]
-        [Route("paged")]
-        public IActionResult GetPagedProducts(PagedProduct pagedProduct)
+        [HttpGet]
+        [Route("page/{pageNumber}")]
+        public IActionResult GetPagedProducts(int pageNumber)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(pagedProduct.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest("Required field are missing");
             }
 
             var productOperations = new ProductOperations(_configuration);
-            var productResponse = productOperations.GetPagedProducts(pagedProduct);
+            var productResponse = productOperations.GetPagedProducts(pageNumber);
 
             return Ok(productResponse);
         }

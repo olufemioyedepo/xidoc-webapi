@@ -4,6 +4,7 @@ using GeofencingWebApi.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -34,21 +35,30 @@ namespace GeofencingWebApi.Business
         {
             var authResponse = new AuthResponse();
 
-            using (var wb = new WebClient())
+            try
             {
-                var data = new NameValueCollection();
+                using (var wb = new WebClient())
+                {
+                    var data = new NameValueCollection();
 
-                data["grant_type"] = "client_credentials";
-                data["client_id"] = "c11b33c6-1e65-4e0b-adc1-bd1e5ea0cdb4";
-                data["client_secret"] = "6CP/?s6yHlbY=9wNG[PPl3ot=w64drqk";
-                data["resource"] = "https://codix-devdevaos.sandbox.ax.dynamics.com";
+                    data["grant_type"] = "client_credentials";
+                    data["client_id"] = "c11b33c6-1e65-4e0b-adc1-bd1e5ea0cdb4";
+                    data["client_secret"] = "6CP/?s6yHlbY=9wNG[PPl3ot=w64drqk";
+                    data["resource"] = "https://codix-devdevaos.sandbox.ax.dynamics.com";
 
-                string url = _configuration.GetSection("AuthConfig").GetSection("url").Value;
+                    string url = _configuration.GetSection("AuthConfig").GetSection("url").Value;
 
-                var response = wb.UploadValues(url, "POST", data);
-                string responseInString = Encoding.UTF8.GetString(response);
+                    var response = wb.UploadValues(url, "POST", data);
+                    string responseInString = Encoding.UTF8.GetString(response);
 
-                authResponse = JsonConvert.DeserializeObject<AuthResponse>(responseInString);
+                    authResponse = JsonConvert.DeserializeObject<AuthResponse>(responseInString);
+
+                    return authResponse.Access_Token.Trim();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
             }
 
             return authResponse.Access_Token.Trim();
@@ -74,14 +84,12 @@ namespace GeofencingWebApi.Business
 
         public Worker Login(EmployeeEmail employeeEmail)
         {
-            // string token = this.GetAuthToken();
             string formattedEndpoint = String.Format(employeelogin, employeeEmail.Email);
 
             var helper = new Helper(_configuration);
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + formattedEndpoint;
 
-            var worker = new Worker();
             var employeeWorker = new Worker();
             var workerResponse = new WorkerResponse();
 
@@ -107,7 +115,7 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             if (workerResponse.value == null)

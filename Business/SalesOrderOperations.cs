@@ -4,6 +4,7 @@ using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,36 +34,47 @@ namespace GeofencingWebApi.Business
 
             string currentEnvironment = helper.GetEnvironmentUrl();
             // url = currentEnvironment + endpoint;
+            var salesOrderResponse = new SalesOrderResponse();
 
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(currentEnvironment);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrder.Token);
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
-
-                var salesOrderForSave = new SalesOrderForSave()
+                using (var client = new HttpClient())
                 {
-                    CustAccount = salesOrder.CustAccount,
-                    StaffPersonnelNumber = salesOrder.StaffPersonnelNumber,
-                    DateTimeCreated = dateTimeCreated,
-                    SalesAgentLatitude = salesOrder.SalesAgentLatitude,
-                    SalesAgentLongitude = salesOrder.SalesAgentLongitude,
-                    SalesName = salesOrder.SalesName,
-                    SalesType = salesOrder.SalesType
-                };
+                    client.BaseAddress = new Uri(currentEnvironment);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrder.Token);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = client.PostAsJsonAsync(salesordercreate, salesOrderForSave).Result;
+                    var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    return null;
+                    var salesOrderForSave = new SalesOrderForSave()
+                    {
+                        CustAccount = salesOrder.CustAccount,
+                        StaffPersonnelNumber = salesOrder.StaffPersonnelNumber,
+                        DateTimeCreated = dateTimeCreated,
+                        SalesAgentLatitude = salesOrder.SalesAgentLatitude,
+                        SalesAgentLongitude = salesOrder.SalesAgentLongitude,
+                        SalesName = salesOrder.SalesName,
+                        SalesType = salesOrder.SalesType
+                    };
+
+                    HttpResponseMessage responseMessage = client.PostAsJsonAsync(salesordercreate, salesOrderForSave).Result;
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
+
+                    salesOrderResponse = responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
+                    // return responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
                 }
-
-                return responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return salesOrderResponse;
         }
 
         public SalesOrderTypes[] GetSalesOrderTypes()
@@ -115,39 +127,52 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return salesOrderResponseList;
         }
 
-        public string CancelSalesOrder(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        public string CancelSalesOrder(SalesOrderNumber salesOrder)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + salesordercancel;
+            string response = String.Empty;
 
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(currentEnvironment);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrderNumberWithToken.Token);
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                var salesOrderNumber = new SalesOrderNumbeForSave()
+                using (var client = new HttpClient())
                 {
-                    SalesOrderNumber = salesOrderNumberWithToken.SalesOrderNumber
-                };
+                    client.BaseAddress = new Uri(currentEnvironment);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = client.PostAsJsonAsync(url, salesOrderNumber).Result;
+                    var salesOrderNumberForSave = new SalesOrderNumbeForSave()
+                    {
+                        SalesOrderNumber = salesOrder.OrdrderNumber
+                    };
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    return null;
+                    HttpResponseMessage responseMessage = client.PostAsJsonAsync(url, salesOrderNumberForSave).Result;
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
+
+                    response = "success";
                 }
-
-                return "success";
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return response;
         }
     }
 }

@@ -34,15 +34,6 @@ namespace GeofencingWebApi.Controllers
         [Route("addasagent")]
         public IActionResult SetGeolocationParameters(SalesAgentPayload salesAgentPayload)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesAgentPayload.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required field(s) is missing!");
@@ -59,35 +50,18 @@ namespace GeofencingWebApi.Controllers
         [Route("removeasagent")]
         public IActionResult RemoveEmployeeAsAgent(RemoveSalesAgentPayload removeSalesAgentPayload)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(removeSalesAgentPayload.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
             var employeeOperations = new EmployeeOperations(_configuration);
             string response = employeeOperations.RemoveEmployeeAsSalesAgent(removeSalesAgentPayload);
 
             return Ok(response);
         }
 
-        [HttpPost]
-        [Route("agents")]
-        public IActionResult GetSalesAgents(Token token)
+        [HttpGet]
+        [Route("salesagents")]
+        public IActionResult GetSalesAgents()
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(token.Value);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             var employeeOperations = new EmployeeOperations(_configuration);
-            var employeeResponse = employeeOperations.GetSalesAgents(token);
+            var employeeResponse = employeeOperations.GetSalesAgents();
 
             return Ok(employeeResponse);
         }

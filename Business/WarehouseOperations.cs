@@ -4,6 +4,7 @@ using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +24,15 @@ namespace GeofencingWebApi.Business
             warehousesendpoint = _configuration.GetSection("Endpoints").GetSection("warehouses").Value;
         }
 
-        public List<Warehouse> GetWarehouses(Token token)
+        public List<Warehouse> GetWarehouses()
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + warehousesendpoint;
 
-            
             var warehousesResponseList = new List<Warehouse>();
 
             try
@@ -40,7 +42,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + token.Value);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -56,7 +58,7 @@ namespace GeofencingWebApi.Business
                 }
             } catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
             }
 
             return warehousesResponseList;

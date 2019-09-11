@@ -20,20 +20,11 @@ namespace GeofencingWebApi.Controllers
             _configuration = configuration;
         }
 
-        [HttpPost]
-        public IActionResult Post(Token authToken)
+        [HttpGet]
+        public IActionResult Get()
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(authToken.Value);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             var warehouseOperations = new WarehouseOperations(_configuration);
-            var warehouseResponse = warehouseOperations.GetWarehouses(authToken);
+            var warehouseResponse = warehouseOperations.GetWarehouses();
 
             return Ok(warehouseResponse);
         }

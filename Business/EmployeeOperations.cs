@@ -4,6 +4,7 @@ using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,7 +62,7 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return employeesList;
@@ -70,36 +71,51 @@ namespace GeofencingWebApi.Business
         public SalesAgentResponse CreateEmployeeAsSalesAgent(SalesAgentPayload salesAgentPayload)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
+            var salesAgentResponse = new SalesAgentResponse();
 
-            using (var client = new HttpClient())
+            try
             {
-                client.BaseAddress = new Uri(currentEnvironment);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesAgentPayload.Token);
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                var salesForSave = new SalesAgentForSave()
+                using (var client = new HttpClient())
                 {
-                    AgentLocation = salesAgentPayload.AgentLocation,
-                    CommissionPercentageRate = salesAgentPayload.CommissionPercentageRate,
-                    CoverageRadius = salesAgentPayload.CoverageRadius,
-                    IsSalesAgent = "true",
-                    OutOfCoverageLimit = salesAgentPayload.OutOfCoverageLimit,
-                    PersonnelNumber = salesAgentPayload.PersonnelNumber,
-                    SalesAgentLatitude = salesAgentPayload.SalesAgentLatitude,
-                    SalesAgentLongitude = salesAgentPayload.SalesAgentLongitude
-                };
+                    client.BaseAddress = new Uri(currentEnvironment);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = client.PostAsJsonAsync(geolocationparameters, salesForSave).Result;
+                    var salesForSave = new SalesAgentForSave()
+                    {
+                        AgentLocation = salesAgentPayload.AgentLocation,
+                        CommissionPercentageRate = salesAgentPayload.CommissionPercentageRate,
+                        CoverageRadius = salesAgentPayload.CoverageRadius,
+                        IsSalesAgent = "true",
+                        OutOfCoverageLimit = salesAgentPayload.OutOfCoverageLimit,
+                        PersonnelNumber = salesAgentPayload.PersonnelNumber,
+                        SalesAgentLatitude = salesAgentPayload.SalesAgentLatitude,
+                        SalesAgentLongitude = salesAgentPayload.SalesAgentLongitude
+                    };
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    return null;
+                    HttpResponseMessage responseMessage = client.PostAsJsonAsync(geolocationparameters, salesForSave).Result;
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
+
+                    salesAgentResponse = responseMessage.Content.ReadAsAsync<SalesAgentResponse>().Result;
+
+                    // return responseMessage.Content.ReadAsAsync<SalesAgentResponse>().Result;
                 }
-
-                return responseMessage.Content.ReadAsAsync<SalesAgentResponse>().Result;
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return salesAgentResponse;
         }
 
         public SalesAgentForSave FormatOdataResponse(SalesAgentResponse salesAgentResponse)
@@ -122,41 +138,59 @@ namespace GeofencingWebApi.Business
         public string RemoveEmployeeAsSalesAgent(RemoveSalesAgentPayload removeSalesAgentPayload)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
+            string response = String.Empty;
 
-            using (var client = new HttpClient())
+
+            try
             {
-                client.BaseAddress = new Uri(currentEnvironment);
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + removeSalesAgentPayload.Token);
-                client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
-
-                var salesAgentParamsForSave = new SalesAgentForSave()
+                using (var client = new HttpClient())
                 {
-                    PersonnelNumber = removeSalesAgentPayload.PersonnelNumber,
-                    AgentLocation = "",
-                    CommissionPercentageRate = 0,
-                    CoverageRadius = 0,
-                    IsSalesAgent = "false",
-                    OutOfCoverageLimit = 0,
-                    SalesAgentLatitude = "",
-                    SalesAgentLongitude = ""
-                };
+                    client.BaseAddress = new Uri(currentEnvironment);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
-                HttpResponseMessage responseMessage = client.PostAsJsonAsync(geolocationparameters, salesAgentParamsForSave).Result;
+                    var salesAgentParamsForSave = new SalesAgentForSave()
+                    {
+                        PersonnelNumber = removeSalesAgentPayload.PersonnelNumber,
+                        AgentLocation = "",
+                        CommissionPercentageRate = 0,
+                        CoverageRadius = 0,
+                        IsSalesAgent = "false",
+                        OutOfCoverageLimit = 0,
+                        SalesAgentLatitude = "",
+                        SalesAgentLongitude = ""
+                    };
 
-                if (!responseMessage.IsSuccessStatusCode)
-                {
-                    return null;
+                    HttpResponseMessage responseMessage = client.PostAsJsonAsync(geolocationparameters, salesAgentParamsForSave).Result;
+
+                    if (!responseMessage.IsSuccessStatusCode)
+                    {
+                        return null;
+                    }
+
+                    response = "success";
+                    
                 }
-
-                return "success";
             }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return response;
         }
 
-        public List<SalesAgentListItem> GetSalesAgents(Token authToken)
+        public List<SalesAgentListItem> GetSalesAgents()
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + salesagents;
 
@@ -168,7 +202,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + authToken.Value);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -185,7 +219,7 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                Log.Error(ex.Message);
             }
 
             return salesAgentListItems;

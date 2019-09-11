@@ -4,6 +4,7 @@ using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +59,7 @@ namespace GeofencingWebApi.Business
                 }
             } catch (Exception ex)
             {
-
+                Log.Error(ex.Message);
             }
 
             foreach (var item in currenciesResponseList)

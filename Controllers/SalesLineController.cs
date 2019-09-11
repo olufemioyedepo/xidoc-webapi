@@ -25,15 +25,6 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(SalesLine salesLineInfo)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesLineInfo.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");
@@ -52,16 +43,9 @@ namespace GeofencingWebApi.Controllers
 
         [HttpPost]
         [Route("salesordernumber")]
-        public IActionResult GetSalesLinesBySalesOrderNumber(SalesOrderNumberWithToken salesOrderNumberWithToken)
+        public IActionResult GetSalesLinesBySalesOrderNumber(SalesOrderNumber salesOrderNumber)
         {
             var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesOrderNumberWithToken.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -69,25 +53,17 @@ namespace GeofencingWebApi.Controllers
             }
 
             var salesLineOperations = new SalesLineOperations(_configuration);
-            var salesLineResponse = salesLineOperations.GetSalesLinesBySalesOrderNumber(salesOrderNumberWithToken);
+            var salesLineResponse = salesLineOperations.GetSalesLinesBySalesOrderNumber(salesOrderNumber);
 
             return Ok(salesLineResponse);
         }
 
-        [HttpPost]
-        [Route("cancel")]
-        public IActionResult CancelSalesLine(SalesLineRecIdWithToken salesLineRecIdWithToken)
+        [HttpGet]
+        [Route("cancel/{salesLineId}")]
+        public IActionResult CancelSalesLine(long salesLineId)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesLineRecIdWithToken.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
             var salesLinesOperations = new SalesLineOperations(_configuration);
-            string response = salesLinesOperations.CancelSalesLine(salesLineRecIdWithToken);
+            string response = salesLinesOperations.CancelSalesLine(salesLineId);
 
             return Ok(response);
         }
