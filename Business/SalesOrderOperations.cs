@@ -17,8 +17,9 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private string salesordercreate, salesordercancel;
-        private string salesorderbypersonnelnumber;
+        private string salesorderbypersonnelnumber, salesorderbyworkerrecid;
         private string jsonResponse;
+        private string salesorderscount, pagedsalesorder;
 
         public SalesOrderOperations(IConfiguration configuration)
         {
@@ -26,15 +27,20 @@ namespace GeofencingWebApi.Business
             salesordercreate = _configuration.GetSection("Endpoints").GetSection("salesordercreate").Value;
             salesordercancel = _configuration.GetSection("Endpoints").GetSection("salesordercancel").Value;
             salesorderbypersonnelnumber = _configuration.GetSection("Endpoints").GetSection("salesorderbypersonnelnumber").Value;
+            salesorderbyworkerrecid = _configuration.GetSection("Endpoints").GetSection("salesorderbyworkerrecid").Value;
+            salesorderscount = _configuration.GetSection("Endpoints").GetSection("salesorderscount").Value;
+            pagedsalesorder = _configuration.GetSection("Endpoints").GetSection("salesorderspaged").Value;
         }
 
-        public SalesOrderResponse Save(SalesOrder salesOrder)
+        public CreateSalesOrderResponse Save(SalesOrder salesOrder)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             // url = currentEnvironment + endpoint;
-            var salesOrderResponse = new SalesOrderResponse();
+            var salesOrderResponse = new CreateSalesOrderResponse();
 
             try
             {
@@ -42,7 +48,7 @@ namespace GeofencingWebApi.Business
                 {
                     client.BaseAddress = new Uri(currentEnvironment);
                     client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + salesOrder.Token);
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
                     client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                     var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
@@ -51,11 +57,14 @@ namespace GeofencingWebApi.Business
                     {
                         CustAccount = salesOrder.CustAccount,
                         StaffPersonnelNumber = salesOrder.StaffPersonnelNumber,
-                        DateTimeCreated = dateTimeCreated,
+                        DateTimeCreated = DateTime.Now, //dateTimeCreated,
                         SalesAgentLatitude = salesOrder.SalesAgentLatitude,
                         SalesAgentLongitude = salesOrder.SalesAgentLongitude,
+                        InventLocationId = salesOrder.InventLocationId,
                         SalesName = salesOrder.SalesName,
-                        SalesType = salesOrder.SalesType
+                        SalesType = "Sales",
+                        UniqueId = helper.GenerateUniqueKey(45)
+                        //SalesType = salesOrder.SalesType
                     };
 
                     HttpResponseMessage responseMessage = client.PostAsJsonAsync(salesordercreate, salesOrderForSave).Result;
@@ -65,7 +74,7 @@ namespace GeofencingWebApi.Business
                         return null;
                     }
 
-                    salesOrderResponse = responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
+                    salesOrderResponse = responseMessage.Content.ReadAsAsync<CreateSalesOrderResponse>().Result;
                     // return responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
                 }
             }
@@ -92,15 +101,16 @@ namespace GeofencingWebApi.Business
             return salesOrderTypes;
         }
 
-        public List<SalesOrderItem> GetSalesOrderByPersonnelNumber(StaffPersonnelWithToken agentIdWithToken)
+        public List<SalesOrderItem> GetSalesOrderByPersonnelNumber(PersonnelNumber staffPersonnelNumber)
         {
             var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
 
+            string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + salesorderbypersonnelnumber;
-            string formattedUrl = String.Format(url, agentIdWithToken.PersonnelNumber);
+            string formattedUrl = String.Format(url, staffPersonnelNumber.Value);
 
-            
             var salesOrderResponseList = new List<SalesOrderItem>();
 
             try
@@ -110,7 +120,7 @@ namespace GeofencingWebApi.Business
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + agentIdWithToken.Token);
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
 
                     using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
                     {
@@ -131,6 +141,104 @@ namespace GeofencingWebApi.Business
             }
 
             return salesOrderResponseList;
+        }
+
+        public List<SalesOrderItem> GetSalesOrderByStaffRecId(long staffRecId)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + salesorderbyworkerrecid;
+            string formattedUrl = String.Format(url, staffRecId);
+
+            var salesOrderResponseList = new List<SalesOrderItem>();
+            var finalSalesOrderResponseList = new List<SalesOrderItem>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(formattedUrl);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var salesOrdersResponse = new SalesOrderResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            salesOrdersResponse = JsonConvert.DeserializeObject<SalesOrderResponse>(jsonResponse);
+                            salesOrderResponseList = salesOrdersResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            foreach (var salesOrderResponseItem in salesOrderResponseList)
+            {
+                SalesOrderItem salesOrderItem;
+
+                salesOrderItem = salesOrderResponseItem;
+                if (salesOrderResponseItem.SalesOrderStatus == "Backorder")
+                {
+                    salesOrderItem.SalesOrderStatus = "Open Order";
+                }
+
+                var nigerianDateTime = helper.ConvertToNigerianTime(salesOrderItem.CreatedOn);
+                salesOrderItem.CreatedOn = nigerianDateTime;
+
+                finalSalesOrderResponseList.Add(salesOrderItem);
+            }
+            
+            return finalSalesOrderResponseList;
+        }
+
+        public long GetSalesOrdersCount(long hcmWorkerRecId)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + salesorderscount;
+            string formattedEndpoint = String.Format(url, hcmWorkerRecId);
+
+            long salesOrdersCountResponse = 0;
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(formattedEndpoint);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            jsonResponse = sr.ReadToEnd();
+                            salesOrdersCountResponse = JsonConvert.DeserializeObject<long>(jsonResponse);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return salesOrdersCountResponse;
         }
 
         public string CancelSalesOrder(SalesOrderNumber salesOrder)
@@ -154,7 +262,7 @@ namespace GeofencingWebApi.Business
 
                     var salesOrderNumberForSave = new SalesOrderNumbeForSave()
                     {
-                        SalesOrderNumber = salesOrder.OrdrderNumber
+                        SalesOrderNumber = salesOrder.OrderNumber
                     };
 
                     HttpResponseMessage responseMessage = client.PostAsJsonAsync(url, salesOrderNumberForSave).Result;
@@ -174,5 +282,56 @@ namespace GeofencingWebApi.Business
 
             return response;
         }
+
+        public List<SalesOrderItem> GetPagedSalesOrders(PagedSalesOrder pagedSalesOrder)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+
+            const int resultperpage = 2;
+            int currentPage = pagedSalesOrder.PageNumber;
+            int skipCount = currentPage * resultperpage;
+
+            // &$skip = 0 &$top = 1
+            // first fetching trip should be skip=0.
+            string formattedproducts = string.Format(pagedsalesorder, pagedSalesOrder.PersonnelNumber, skipCount, resultperpage);
+
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + formattedproducts;
+
+            var salesOrderResponseList = new List<SalesOrderItem>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var salesOrderResponse = new SalesOrderResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            salesOrderResponse = JsonConvert.DeserializeObject<SalesOrderResponse>(jsonResponse);
+                            salesOrderResponseList = salesOrderResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return salesOrderResponseList;
+        }
+
     }
 }

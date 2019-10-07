@@ -24,15 +24,6 @@ namespace GeofencingWebApi.Controllers
         [HttpPost]
         public IActionResult Post(SalesOrder salesOrderInfo)
         {
-            var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(salesOrderInfo.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
-
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");
@@ -51,16 +42,9 @@ namespace GeofencingWebApi.Controllers
 
         [HttpPost]
         [Route("personnelnumber")]
-        public IActionResult GetSalesOrderByAgentId(StaffPersonnelWithToken agentIdWithToken)
+        public IActionResult GetSalesOrderByPersonnelNumber(PersonnelNumber personnelNumber)
         {
             var authOperation = new AuthOperations(_configuration);
-
-            bool tokenExpired = authOperation.TokenExpired(agentIdWithToken.Token);
-
-            if (tokenExpired)
-            {
-                return BadRequest("Authentication token has expired!");
-            }
 
             if (!ModelState.IsValid)
             {
@@ -68,7 +52,33 @@ namespace GeofencingWebApi.Controllers
             }
 
             var salesOrderOperations = new SalesOrderOperations(_configuration);
-            var salesOrderResponse = salesOrderOperations.GetSalesOrderByPersonnelNumber(agentIdWithToken);
+            var salesOrderResponse = salesOrderOperations.GetSalesOrderByPersonnelNumber(personnelNumber);
+
+            return Ok(salesOrderResponse);
+        }
+
+        [HttpGet]
+        [Route("employeeRecId/{staffRecId}")]
+        public IActionResult GetSalesOrderByEmployeeRecId(string staffRecId)
+        {
+            long staffrecid;
+
+            if (staffRecId == null)
+            {
+                return BadRequest("Staff Rec ID is missing!");
+            }
+
+            try
+            {
+                staffrecid = Convert.ToInt64(staffRecId);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Couldn't cast Staff Rec ID");
+            }
+
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            var salesOrderResponse = salesOrderOperations.GetSalesOrderByStaffRecId(staffrecid);
 
             return Ok(salesOrderResponse);
         }
@@ -91,6 +101,26 @@ namespace GeofencingWebApi.Controllers
             string response = salesOrderOperations.CancelSalesOrder(salesOrderNumber);
 
             return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("count/{hcmWorkerRecId}")]
+        public IActionResult SalesOrdersCount(long hcmWorkerRecId)
+        {
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            long salesOrdersCount = salesOrderOperations.GetSalesOrdersCount(hcmWorkerRecId);
+
+            return Ok(salesOrdersCount);
+        }
+
+        [HttpPost]
+        [Route("paged")]
+        public IActionResult PagedSalesOrders(PagedSalesOrder pagedSalesOrder)
+        {
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            var pagedSalesOrdersResponse = salesOrderOperations.GetPagedSalesOrders(pagedSalesOrder);
+
+            return Ok(pagedSalesOrdersResponse);
         }
     }
 }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GeofencingWebApi.Business;
+using GeofencingWebApi.Models.DTOs;
 using GeofencingWebApi.Models.Entities;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -18,6 +20,17 @@ namespace GeofencingWebApi.Controllers
         public CustomersController(IConfiguration configuration)
         {
             _configuration = configuration;
+        }
+
+        [HttpGet]
+        [EnableCors("AllowOrigin")]
+        public IActionResult Get()
+        {
+            var customerOperations = new CustomerOperations(_configuration);
+
+            var customersResponse = customerOperations.GetCustomers();
+
+            return Ok(customersResponse);
         }
 
         [HttpPost]
@@ -46,6 +59,17 @@ namespace GeofencingWebApi.Controllers
             }
 
             return Created("createcustomer", customerResponse);
+        }
+
+        [HttpPost]
+        [Route("staffpersonnelnumber")]
+        public IActionResult GetCustomersByStaffPersonnelNumber(PersonnelNumber staffPersonnelNumber)
+        {
+            var customerOperations = new CustomerOperations(_configuration);
+
+            var customersResponse = customerOperations.GetCustomersByPersonnelNumber(staffPersonnelNumber);
+
+            return Ok(customersResponse);
         }
     }
 }

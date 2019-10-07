@@ -41,6 +41,7 @@ namespace GeofencingWebApi.Controllers
             return Created("createsalesline", salesLineResponse);
         }
 
+        /*
         [HttpPost]
         [Route("salesordernumber")]
         public IActionResult GetSalesLinesBySalesOrderNumber(SalesOrderNumber salesOrderNumber)
@@ -54,6 +55,24 @@ namespace GeofencingWebApi.Controllers
 
             var salesLineOperations = new SalesLineOperations(_configuration);
             var salesLineResponse = salesLineOperations.GetSalesLinesBySalesOrderNumber(salesOrderNumber);
+
+            return Ok(salesLineResponse);
+        }
+        */
+
+        [HttpGet]
+        [Route("salesordernumber/{orderNumber}")]
+        public IActionResult GetSalesLinesBySalesOrderNumber(string orderNumber)
+        {
+            var authOperation = new AuthOperations(_configuration);
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("One of the required fields is missing!");
+            }
+
+            var salesLineOperations = new SalesLineOperations(_configuration);
+            var salesLineResponse = salesLineOperations.GetSalesLinesBySalesOrderNumber(orderNumber);
 
             return Ok(salesLineResponse);
         }

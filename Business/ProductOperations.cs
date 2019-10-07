@@ -26,7 +26,7 @@ namespace GeofencingWebApi.Business
             productscount = _configuration.GetSection("Endpoints").GetSection("productscount").Value;
         }
 
-        public List<Item> GetProducts()
+        public List<ProductItem> GetProducts()
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -35,7 +35,7 @@ namespace GeofencingWebApi.Business
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + products;
             
-            var productsResponseList = new List<Item>();
+            var productsResponseList = new List<ProductItem>();
 
             try
             {
@@ -65,6 +65,63 @@ namespace GeofencingWebApi.Business
             }
 
             return productsResponseList;
+        }
+
+        public List<ProductItem> GetProductsWithoutToken(string token)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            //string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + products;
+
+            var productsResponseList = new List<ProductItem>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var productsResponse = new ProductsResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            productsResponse = JsonConvert.DeserializeObject<ProductsResponse>(jsonResponse);
+                            productsResponseList = productsResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return productsResponseList;
+        }
+
+        public static String GetProductName(List<ProductItem> products, string itemNumber)
+        {
+            string productName = String.Empty;
+
+            foreach (var product in products)
+            {
+                if (product.ProductNumber == itemNumber)
+                {
+                    productName = product.ProductName;
+                    break;
+                }
+            }
+
+            return productName;
         }
 
         public long GetProductsCount()
@@ -105,7 +162,7 @@ namespace GeofencingWebApi.Business
             return productCountResponse;
         }
 
-        public List<Item> GetPagedProducts(int pageNumber)
+        public List<ProductItem> GetPagedProducts(int pageNumber)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -122,7 +179,7 @@ namespace GeofencingWebApi.Business
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + formattedproducts;
 
-            var productsResponseList = new List<Item>();
+            var productsResponseList = new List<ProductItem>();
 
             try
             {
@@ -154,5 +211,6 @@ namespace GeofencingWebApi.Business
             return productsResponseList;
         }
 
+        
     }
 }

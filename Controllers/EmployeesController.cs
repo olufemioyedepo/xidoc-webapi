@@ -65,5 +65,15 @@ namespace GeofencingWebApi.Controllers
 
             return Ok(employeeResponse);
         }
+
+        [HttpGet]
+        [Route("recId/{recId}")]
+        public IActionResult GetEmployeeByRecId(long recId)
+        {
+            var employeeOperations = new EmployeeOperations(_configuration);
+            var employeeResponse = employeeOperations.GetEmployeeByRecId(recId);
+
+            return Ok(employeeResponse);
+        }
     }
 }

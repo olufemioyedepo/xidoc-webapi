@@ -1,4 +1,5 @@
-﻿using GeofencingWebApi.Models.Entities;
+﻿using GeofencingWebApi.Models.DTOs;
+using GeofencingWebApi.Models.Entities;
 using GeofencingWebApi.Models.ODataResponse;
 using GeofencingWebApi.Util;
 using Microsoft.Extensions.Configuration;
@@ -15,15 +16,58 @@ namespace GeofencingWebApi.Business
     public class CustomerOperations
     {
         readonly IConfiguration _configuration;
-        private readonly string endpoint, customergroups;
+        private readonly string createcustomerendpoint, getcustomersendpoint, customersbypersonnelnumber, customergroups;
         private string jsonResponse;
         //private string url;
 
         public CustomerOperations(IConfiguration configuration)
         {
             _configuration = configuration;
-            endpoint = _configuration.GetSection("Endpoints").GetSection("createcustomer").Value;
+            createcustomerendpoint = _configuration.GetSection("Endpoints").GetSection("createcustomer").Value;
+            getcustomersendpoint = _configuration.GetSection("Endpoints").GetSection("customers").Value;
+            customersbypersonnelnumber = _configuration.GetSection("Endpoints").GetSection("customersbystaffpersonnelnumber").Value;
             customergroups = _configuration.GetSection("Endpoints").GetSection("customergroups").Value;
+        }
+
+        public List<SingleCustomerResponse> GetCustomers()
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + getcustomersendpoint;
+
+            var customersList = new List<SingleCustomerResponse>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var fetchCustomersResponse = new FetchCustomersResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchCustomersResponse>(jsonResponse);
+                            customersList = fetchCustomersResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return customersList;
         }
 
         public CustomerResponse Save(Customer customerInfo)
@@ -55,7 +99,7 @@ namespace GeofencingWebApi.Business
                     State = customerInfo.State
                 };
 
-                HttpResponseMessage responseMessage = client.PostAsJsonAsync(endpoint, customerForSave).Result;
+                HttpResponseMessage responseMessage = client.PostAsJsonAsync(createcustomerendpoint, customerForSave).Result;
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
@@ -105,6 +149,48 @@ namespace GeofencingWebApi.Business
             }
 
             return customerGroupResponseList;
+        }
+
+        public List<V3CustomerResponse> GetCustomersByPersonnelNumber(PersonnelNumber staffPersonnelNumber)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string formatcustomersendpoint = String.Format(customersbypersonnelnumber, staffPersonnelNumber.Value);
+            string url = currentEnvironment + formatcustomersendpoint;
+
+            var customersList = new List<V3CustomerResponse>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var fetchCustomersResponse = new FetchV3CustomersResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
+                            customersList = fetchCustomersResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return customersList;
         }
     }
 }

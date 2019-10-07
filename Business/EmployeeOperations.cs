@@ -16,7 +16,7 @@ namespace GeofencingWebApi.Business
     public class EmployeeOperations
     {
         readonly IConfiguration _configuration;
-        private readonly string employees, geolocationparameters, salesagents;
+        private readonly string employees, geolocationparameters, salesagents, single_employee;
         private string jsonResponse;
 
         public EmployeeOperations(IConfiguration configuration)
@@ -25,6 +25,7 @@ namespace GeofencingWebApi.Business
             employees = _configuration.GetSection("Endpoints").GetSection("employees").Value;
             geolocationparameters = _configuration.GetSection("Endpoints").GetSection("geolocationparameters").Value;
             salesagents = _configuration.GetSection("Endpoints").GetSection("salesagents").Value;
+            single_employee = _configuration.GetSection("Endpoints").GetSection("single_employee").Value;
         }
 
         public List<EmployeeWorker> GetEmployees()
@@ -223,6 +224,51 @@ namespace GeofencingWebApi.Business
             }
 
             return salesAgentListItems;
+        }
+
+        public ShortEmployeeWorker GetEmployeeByRecId(long employeeId)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string formattedEndpoint = String.Format(single_employee, employeeId);
+            string url = currentEnvironment + formattedEndpoint;
+
+            var singleEmployee = new ShortEmployeeWorker();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var employeeWorkerResponse = new ShortEmployeeWorkerResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            employeeWorkerResponse = JsonConvert.DeserializeObject<ShortEmployeeWorkerResponse>(jsonResponse);
+                            if (employeeWorkerResponse.value.Count > 0)
+                            {
+                                singleEmployee = employeeWorkerResponse.value.ElementAt(0);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return singleEmployee;
         }
     }
 }

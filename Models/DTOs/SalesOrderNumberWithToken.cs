@@ -9,7 +9,7 @@ namespace GeofencingWebApi.Models.DTOs
     public class SalesOrderNumber
     {
         [Required]
-        public string OrdrderNumber { get; set; }
+        public string OrderNumber { get; set; }
     }
 
     public class SalesOrderNumbeForSave

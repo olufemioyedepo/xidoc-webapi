@@ -26,6 +26,7 @@ namespace GeofencingWebApi.Models.ODataResponse
     {
         //[JsonProperty("@odata.etag")]
         // public string etag { get; set; }
+        public string ProductName { get; set; }
         public string ItemNumber { get; set; }
         public string SalesOrderNumber { get; set; }
         public string ShippingWarehouseId { get; set; }

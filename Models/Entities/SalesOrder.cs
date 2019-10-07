@@ -57,8 +57,8 @@ namespace GeofencingWebApi.Models.Entities
         /// <summary>
         /// JWT Bearer Token 
         /// </summary>
-        [Required]
-        public string Token { get; set; }
+        //[Required]
+        //public string Token { get; set; }
 
         /// <summary>
         /// The Latitutude coordinate of the agent making the sales order
@@ -72,13 +72,14 @@ namespace GeofencingWebApi.Models.Entities
         public DateTime DateTimeCreated { get; set; }
         [Required]
         public string CustAccount { get; set; }
-        public string CreatorId { get; set; }
+        //public string CreatorId { get; set; }
         [Required]
         public string StaffPersonnelNumber { get; set; }
         public string SalesName { get; set; }
+        public string UniqueId { get; set; }
         public string SalesType { get; set; }
         //public string InventSiteId { get; set; }
-        //public string InventLocationId { get; set; }
+        public string InventLocationId { get; set; }
         [Required]
         public string SalesAgentLongitude { get; set; }
         [Required]

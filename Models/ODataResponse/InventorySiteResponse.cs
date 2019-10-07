@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.ODataResponse
 {
-    public class WarehouseResponse
+    public class InventorySiteResponse
     {
         [JsonProperty("@odata.context")]
         public string odatacontext { get; set; }
         [JsonProperty("value")]
-        public List<Warehouse> value { get; set; }
+        public List<InventorySite> value { get; set; }
     }
-
+    
 }

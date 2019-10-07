@@ -62,6 +62,14 @@ namespace GeofencingWebApi.Business
                 Log.Error(ex.Message);
             }
 
+            var firstCurrencyItem = new CurrencyItem()
+            {
+                CurrencyCode = "NGN",
+                NameCurrencyCode = "Naira"
+            };
+
+            currencyNameCodeList.Add(firstCurrencyItem);
+
             foreach (var item in currenciesResponseList)
             {
                 var obj = new CurrencyItem()
@@ -70,7 +78,10 @@ namespace GeofencingWebApi.Business
                     NameCurrencyCode = item.Name + " (" + item.CurrencyCode + ")"
                 };
 
-                currencyNameCodeList.Add(obj);
+                if (item.CurrencyCode != "NGN")
+                {
+                    currencyNameCodeList.Add(obj);
+                }
             }
 
             return currencyNameCodeList;

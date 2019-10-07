@@ -22,4 +22,35 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string Name { get; set; }
         //public double CreatorId {get; set; }
     }
+
+    public class SingleCustomerResponse
+    {
+        //[JsonProperty("@odata.etag")]
+        //public string etag { get; set; }
+        public string CustomerAccount { get; set; }
+        public string Name { get; set; }
+
+    }
+
+    public class V3CustomerResponse
+    {
+        public string CustomerAccount { get; set; }
+        public string OrganizationName { get; set; }
+        public string PrimaryContactPhone { get; set; }
+        public string CustomerGroupId { get; set; }
+    }
+
+    public class FetchV3CustomersResponse
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+        public List<V3CustomerResponse> value { get; set; }
+    }
+
+    public class FetchCustomersResponse
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+        public List<SingleCustomerResponse> value { get; set; }
+    }
 }

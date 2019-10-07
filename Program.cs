@@ -19,7 +19,7 @@ namespace GeofencingWebApi
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Verbose()
                 .WriteTo.Console()
-                .WriteTo.File("Logs\\ApiCalls.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.File("Logs\\ApiCalls.txt")/*, rollingInterval: RollingInterval.Day)*/
                 .CreateLogger();
 
             try

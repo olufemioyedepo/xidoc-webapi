@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.Entities
 {
-    public class Warehouse
+    public class InventorySite
     {
-        public string InventLocationId { get; set; }
+        public string SiteId { get; set; }
         public string Name { get; set; }
     }
 }

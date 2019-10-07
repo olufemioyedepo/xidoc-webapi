@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -30,11 +31,30 @@ namespace GeofencingWebApi.Util
             return environmentUrl;
         }
 
-        public static string GenerateUniqueKey(int length)
+        public string GenerateUniqueKey(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrtuvyxyz0123456789";
             return new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public string Get8CharacterRandomString()
+        {
+            string path = Path.GetRandomFileName();
+            path = path.Replace(".", ""); // Remove period.
+            return path.Substring(0, 8);  // Return 8 character string
+        }
+
+        public DateTime ConvertToNigerianTime(DateTime dateTime)
+        {
+            DateTime convertedDateTime;
+
+            if (dateTime == null)
+            {
+                return DateTime.Now;
+            }
+
+            return convertedDateTime = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
         }
     }
 }

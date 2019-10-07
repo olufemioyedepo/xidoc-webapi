@@ -17,7 +17,7 @@ namespace GeofencingWebApi.Business
     public class SalesLineOperations
     {
         readonly IConfiguration _configuration;
-        private readonly string saleslinecreate, saleslinecancel, saleslinebyordernumber;
+        private readonly string saleslinecreate, saleslinecancel, saleslinebyordernumber, saleslinecount;
         private string jsonResponse;
 
         public SalesLineOperations(IConfiguration configuration)
@@ -26,6 +26,7 @@ namespace GeofencingWebApi.Business
             saleslinecreate = _configuration.GetSection("Endpoints").GetSection("saleslinecreate").Value;
             saleslinecancel = _configuration.GetSection("Endpoints").GetSection("saleslinecancel").Value;
             saleslinebyordernumber = _configuration.GetSection("Endpoints").GetSection("saleslinebyordernumber").Value;
+            saleslinecount = _configuration.GetSection("Endpoints").GetSection("saleslinebyordernumber").Value;
         }
 
         public SalesLineItemResponse Save(SalesLine salesLine)
@@ -80,17 +81,19 @@ namespace GeofencingWebApi.Business
             return salesLineItemResponse;
         }
 
-        public List<SalesLineListItem> GetSalesLinesBySalesOrderNumber(SalesOrderNumber salesOrder)
+        public List<SalesLineListItem> GetSalesLinesBySalesOrderNumber(string salesOrderNumber)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
+            var productOperation = new ProductOperations(_configuration);
 
             string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + saleslinebyordernumber;
-            string formattedUrl = String.Format(url, salesOrder.OrdrderNumber);
+            string formattedUrl = String.Format(url, salesOrderNumber);
 
-            
+            var products = productOperation.GetProductsWithoutToken(token);
+
             var saleLineResponseList = new List<SalesLineListItem>();
 
             try
@@ -118,6 +121,12 @@ namespace GeofencingWebApi.Business
             catch (Exception ex)
             {
                 Log.Error(ex.Message);
+            }
+
+            foreach (var item in saleLineResponseList)
+            {
+                string productName = ProductOperations.GetProductName(products, item.ItemNumber);
+                item.ProductName = productName;
             }
 
             return saleLineResponseList;
@@ -153,6 +162,45 @@ namespace GeofencingWebApi.Business
 
                 return "success";
             }
+        }
+
+        public long GetSalesLinesCount(string salesOrderNumber)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + saleslinecount;
+            string formattedEndpoint = String.Format(url, salesOrderNumber);
+
+            long salesLineCountResponse = 0;
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(formattedEndpoint);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            jsonResponse = sr.ReadToEnd();
+                            salesLineCountResponse = JsonConvert.DeserializeObject<long>(jsonResponse);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return salesLineCountResponse;
         }
     }
 }

@@ -1,0 +1,10 @@
+dadsdsdsdsd2019-09-25 10:57:34.093 +01:00 [ERR] Cannot deserialize the current JSON array (e.g. [1,2,3]) into type 'GeofencingWebApi.Models.ODataResponse.ShortEmployeeWorker' because the type requires a JSON object (e.g. {"name":"value"}) to deserialize correctly.
+To fix this error either change the JSON to a JSON object (e.g. {"name":"value"}) or change the deserialized type to an array or a type that implements a collection interface (e.g. ICollection, IList) like List<T> that can be deserialized from a JSON array. JsonArrayAttribute can also be added to the type to force it to deserialize from a JSON array.
+Path 'value', line 2, position 158.
+2019-09-25 11:00:44.332 +01:00 [ERR] Cannot deserialize the current JSON array (e.g. [1,2,3]) into type 'GeofencingWebApi.Models.ODataResponse.ShortEmployeeWorker' because the type requires a JSON object (e.g. {"name":"value"}) to deserialize correctly.
+To fix this error either change the JSON to a JSON object (e.g. {"name":"value"}) or change the deserialized type to an array or a type that implements a collection interface (e.g. ICollection, IList) like List<T> that can be deserialized from a JSON array. JsonArrayAttribute can also be added to the type to force it to deserialize from a JSON array.
+Path 'value', line 2, position 158.
+2019-09-30 22:34:11.881 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2019-09-30 22:35:20.952 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2019-10-05 16:47:41.065 +01:00 [ERR] No such host is known No such host is known
+2019-10-05 16:49:59.015 +01:00 [ERR] No such host is known No such host is known
