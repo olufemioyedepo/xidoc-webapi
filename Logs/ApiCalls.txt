@@ -8,3 +8,5 @@ Path 'value', line 2, position 158.
 2019-09-30 22:35:20.952 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
 2019-10-05 16:47:41.065 +01:00 [ERR] No such host is known No such host is known
 2019-10-05 16:49:59.015 +01:00 [ERR] No such host is known No such host is known
+2019-10-12 00:01:19.117 +01:00 [ERR] One or more errors occurred. (No such host is known)
+2019-10-14 16:19:47.008 +01:00 [ERR] An error occurred while sending the request. Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.

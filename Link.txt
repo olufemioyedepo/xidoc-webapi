@@ -1,3 +1,4 @@
 ﻿https://community.dynamics.com/365/financeandoperations/b/nevoitechfinance/posts/create-sales-order-using-x
 https://community.dynamics.com/ax/b/k3retailtechnicalblog/posts/cancelling-a-sales-order-programmatically-in-dynamics-ax-2009
 https://mandruchow.blogspot.com/2016/11/create-sales-header-create-sales-line.html
+https://partnersource.blogspot.com/2019/10/crud-with-odata-and-data-entities-in_13.html

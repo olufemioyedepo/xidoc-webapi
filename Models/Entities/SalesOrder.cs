@@ -55,12 +55,6 @@ namespace GeofencingWebApi.Models.Entities
         public string SalesAgentLongitude { get; set; }
 
         /// <summary>
-        /// JWT Bearer Token 
-        /// </summary>
-        //[Required]
-        //public string Token { get; set; }
-
-        /// <summary>
         /// The Latitutude coordinate of the agent making the sales order
         /// </summary>
         [Required]

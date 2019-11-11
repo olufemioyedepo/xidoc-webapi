@@ -29,7 +29,7 @@ namespace GeofencingWebApi.Models.Entities
         /// <summary>
         /// The User ID of the Agent creating the Customer
         /// </summary>
-        // public double CreatorId { get; set; } // User ID of agent creating the customer entity
+        public string HcmWorkerRecId { get; set; } // User ID of agent creating the customer entity
 
         /// <summary>
         /// JWT Bearer Token 
@@ -71,7 +71,7 @@ namespace GeofencingWebApi.Models.Entities
         [Required]
         public string Name { get; set; }
 
-        // public double CreatorId { get; set; } // User ID of agent creating the customer entity
+        public double CreatorId { get; set; }
 
         [Required]
         public string PersonnelNumber { get; set; }

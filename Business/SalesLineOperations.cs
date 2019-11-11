@@ -52,14 +52,17 @@ namespace GeofencingWebApi.Business
                     var salesLineForSave = new SalesLineForSave()
                     {
                         SalesId = salesLine.SalesId,
-                        PersonnelNumber = salesLine.PersonnelNumber,
                         Warehouse = salesLine.Warehouse,
                         ItemId = salesLine.ItemId,
-                        DateTimeCreated = dateTimeCreated,
+                        DateTimeCreated = DateTime.Now,
+                        //PersonnelNumber = salesLine.PersonnelNumber,
                         LineDisc = salesLine.LineDisc,
+                        SalesQty = salesLine.SalesQty,
+                        PriceUnit = salesLine.PriceUnit,
+                        //SalesPrice = salesLine.SalesPrice,
                         SalesAgentLatitude = salesLine.SalesAgentLatitude,
                         SalesAgentLongitude = salesLine.SalesAgentLongitude,
-                        SalesQty = salesLine.SalesQty
+                        UniqueId = helper.GenerateUniqueKey(45)
                     };
 
                     HttpResponseMessage responseMessage = client.PostAsJsonAsync(saleslinecreate, salesLineForSave).Result;
@@ -127,8 +130,10 @@ namespace GeofencingWebApi.Business
             {
                 string productName = ProductOperations.GetProductName(products, item.ItemNumber);
                 item.ProductName = productName;
+                var nigerianDateTime = helper.ConvertToNigerianTime(item.CreatedOn);
+                item.CreatedOn = nigerianDateTime;
             }
-
+            
             return saleLineResponseList;
         }
 

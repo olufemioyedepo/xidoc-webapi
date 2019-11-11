@@ -8,8 +8,8 @@ namespace GeofencingWebApi.Models.ODataResponse
 {
     public class SalesLineItemResponse
     {
-        [JsonProperty("@odata.context")]
-        public string odatacontext { get; set; }
+        // [JsonProperty("@odata.context")]
+        // public string odatacontext { get; set; }
         public string SalesId { get; set; }
         public double SalesQty { get; set; }
         public DateTime DateTimeCreated { get; set; }
@@ -30,8 +30,9 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string ItemNumber { get; set; }
         public string SalesOrderNumber { get; set; }
         public string ShippingWarehouseId { get; set; }
-        public string SalesUnitSymbol { get; set; }
-        public DateTime RequestedReceiptDate { get; set; }
+        //public string SalesUnitSymbol { get; set; }
+        //public DateTime RequestedReceiptDate { get; set; }
+        public DateTime CreatedOn { get; set; }
         public double SalesPrice { get; set; }
         public double LineAmount { get; set; }
         public int OrderedSalesQuantity { get; set; }

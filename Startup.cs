@@ -22,21 +22,24 @@ namespace GeofencingWebApi
             Configuration = configuration;
         }
 
+        readonly string AllowOrigin = "_myAllowSpecificOrigins";
+
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSwaggerGen(c => {
-                c.SwaggerDoc("v1", new Info { Title = "CODIX Geofencing Web Api", Description = "" });
+                c.SwaggerDoc("v1", new Info { Title = "CODIX Geofencing Web API", Description = "" });
             }
             );
 
 
-            services.AddCors(c =>
-            {
-                c.AddPolicy("AllowOrigin", options => options.WithOrigins("http://127.0.0.1:5500"));
-            });
+            //services.AddCors(c =>
+            //{
+            //    c.AddPolicy("AllowOrigin", options => options.WithOrigins("http://localhost:63276").AllowAnyMethod().AllowAnyHeader());
+            //});
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddSingleton<IConfiguration>(Configuration);
@@ -55,10 +58,17 @@ namespace GeofencingWebApi
                 app.UseHsts();
             }
 
-            app.UseCors(builder =>
-            {
-                builder.WithOrigins("http://127.0.0.1:5500");
-            });
+            //app.UseCors(builder =>
+            //{
+            //    builder.WithOrigins("AllowOrigin");
+            //});
+            //app.UseCors(AllowOrigin);
+
+            app.UseCors(corsPolicyBuilder =>
+               corsPolicyBuilder.WithOrigins("http://localhost:63276", "https://localhost:44322", "http://127.0.0.1:5500", "https://xidocadmin.azurewebsites.net")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+            );
 
             app.UseHttpsRedirection();
 

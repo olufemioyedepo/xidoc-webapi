@@ -202,6 +202,65 @@ namespace GeofencingWebApi.Business
             return finalSalesOrderResponseList;
         }
 
+        public SalesOrderItem GetLastSalesOrderByStaffRecId(long staffRecId)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + salesorderbyworkerrecid;
+            string formattedUrl = String.Format(url, staffRecId);
+
+            var salesOrderResponseList = new List<SalesOrderItem>();
+            var finalSalesOrderResponseList = new List<SalesOrderItem>();
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(formattedUrl);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    {
+                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                        {
+                            var salesOrdersResponse = new SalesOrderResponse();
+
+                            jsonResponse = sr.ReadToEnd();
+                            salesOrdersResponse = JsonConvert.DeserializeObject<SalesOrderResponse>(jsonResponse);
+                            salesOrderResponseList = salesOrdersResponse.value;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            foreach (var salesOrderResponseItem in salesOrderResponseList)
+            {
+                SalesOrderItem salesOrderItem;
+
+                salesOrderItem = salesOrderResponseItem;
+                if (salesOrderResponseItem.SalesOrderStatus == "Backorder")
+                {
+                    salesOrderItem.SalesOrderStatus = "Open Order";
+                }
+
+                var nigerianDateTime = helper.ConvertToNigerianTime(salesOrderItem.CreatedOn);
+                salesOrderItem.CreatedOn = nigerianDateTime;
+
+                finalSalesOrderResponseList.Add(salesOrderItem);
+            }
+
+            return finalSalesOrderResponseList.ElementAt(0);
+        }
+
         public long GetSalesOrdersCount(long hcmWorkerRecId)
         {
             var helper = new Helper(_configuration);
@@ -283,25 +342,27 @@ namespace GeofencingWebApi.Business
             return response;
         }
 
-        public List<SalesOrderItem> GetPagedSalesOrders(PagedSalesOrder pagedSalesOrder)
+        public List<SalesOrderItem> GetPagedSalesOrders(int pageNumber, String hcmWorkerRecId)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
 
             string token = authOperation.GetAuthToken();
 
-            const int resultperpage = 2;
-            int currentPage = pagedSalesOrder.PageNumber;
+            const int resultperpage = 10;
+            int currentPage = pageNumber;
             int skipCount = currentPage * resultperpage;
+            long hcmWorkerId = Convert.ToInt64(hcmWorkerRecId);
 
             // &$skip = 0 &$top = 1
-            // first fetching trip should be skip=0.
-            string formattedproducts = string.Format(pagedsalesorder, pagedSalesOrder.PersonnelNumber, skipCount, resultperpage);
+            // first fetchtrip should be skip=0.
+            string formattedproducts = string.Format(pagedsalesorder, hcmWorkerId, skipCount, resultperpage);
 
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + formattedproducts;
 
             var salesOrderResponseList = new List<SalesOrderItem>();
+            var finalSalesOrderResponseList = new List<SalesOrderItem>();
 
             try
             {
@@ -330,7 +391,23 @@ namespace GeofencingWebApi.Business
                 Log.Error(ex.Message);
             }
 
-            return salesOrderResponseList;
+            foreach (var salesOrderResponseItem in salesOrderResponseList)
+            {
+                SalesOrderItem salesOrderItem;
+
+                salesOrderItem = salesOrderResponseItem;
+                if (salesOrderResponseItem.SalesOrderStatus == "Backorder")
+                {
+                    salesOrderItem.SalesOrderStatus = "Open Order";
+                }
+
+                var nigerianDateTime = helper.ConvertToNigerianTime(salesOrderItem.CreatedOn);
+                salesOrderItem.CreatedOn = nigerianDateTime;
+
+                finalSalesOrderResponseList.Add(salesOrderItem);
+            }
+
+            return finalSalesOrderResponseList;
         }
 
     }

@@ -29,7 +29,6 @@ namespace GeofencingWebApi.Controllers
             return Ok(productResponse);
         }
 
-
         [HttpPost]
         [Route("count")]
         public IActionResult ProductCount()
@@ -53,6 +52,16 @@ namespace GeofencingWebApi.Controllers
             var productResponse = productOperations.GetPagedProducts(pageNumber);
 
             return Ok(productResponse);
+        }
+
+        [HttpGet]
+        [Route("released")]
+        public IActionResult GetReleaseProducts()
+        {
+            var productOperations = new ProductOperations(_configuration);
+            var releasedProductResponse = productOperations.GetReleasedProducts();
+
+            return Ok(releasedProductResponse);
         }
 
     }

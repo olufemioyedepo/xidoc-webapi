@@ -46,8 +46,8 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string SalesOrderNumber { get; set; } // SalesId
         public string SalesOrderName { get; set; }
         public string InvoiceCustomerAccountNumber { get; set; }
-        public string SalesAgentLongitude { get; set; }
-        public string SalesAgentLatitude { get; set; }
+        //public string SalesAgentLongitude { get; set; }
+        //public string SalesAgentLatitude { get; set; }
         public DateTime CreatedOn { get; set; }
         //public string PersonnelNumber { get; set; }
         public string SalesOrderStatus { get; set; }

@@ -41,6 +41,9 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string PersonnelNumber { get; set; }
         public string PrimaryContactEmail { get; set; }
         public long HcmWorkerRecId { get; set; }
+        public string SalesAgentLongitude { get; set; }
+        public string SalesAgentLatitude { get; set; }
+        public float CoverageRadius { get; set; }
     }
 
     public class ShortEmployeeWorkerResponse

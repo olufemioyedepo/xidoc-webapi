@@ -61,15 +61,69 @@ namespace GeofencingWebApi.Controllers
             return Created("createcustomer", customerResponse);
         }
 
-        [HttpPost]
-        [Route("staffpersonnelnumber")]
-        public IActionResult GetCustomersByStaffPersonnelNumber(PersonnelNumber staffPersonnelNumber)
+        //[HttpPost]
+        //[Route("staffpersonnelnumber")]
+        //public IActionResult GetCustomersByStaffPersonnelNumber(PersonnelNumber staffPersonnelNumber)
+        //{
+        //    var customerOperations = new CustomerOperations(_configuration);
+
+        //    var customersResponse = customerOperations.GetCustomersByPersonnelNumber(staffPersonnelNumber);
+
+        //    return Ok(customersResponse);
+        //}
+
+        [HttpDelete]
+        [Route("delete/{customerAccount}")]
+        public IActionResult DeleteCustomer(String customerAccount)
         {
             var customerOperations = new CustomerOperations(_configuration);
+            var response = customerOperations.DeleteCustomer(customerAccount);
 
-            var customersResponse = customerOperations.GetCustomersByPersonnelNumber(staffPersonnelNumber);
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("staffid/{employeeRecId}")]
+        public IActionResult GetCustomersByStaffRecId(String employeeRecId)
+        {
+            long id = Convert.ToInt64(employeeRecId);
+
+            var customerOperations = new CustomerOperations(_configuration);
+
+            var customersResponse = customerOperations.GetCustomersByEmployeeRecId(id);
 
             return Ok(customersResponse);
+        }
+
+        [HttpGet]
+        [Route("pagedstaffid/{employeeRecId}/{skipCount}")]
+        public IActionResult GetPagedCustomersByStaffRecId(String employeeRecId, int skipCount)
+        {
+            long id = Convert.ToInt64(employeeRecId);
+            var pagedCustomer = new PagedCustomers()
+            {
+                HcmWorkerRecId = employeeRecId,
+                Skip = skipCount
+            };
+
+            var customerOperations = new CustomerOperations(_configuration);
+
+            var customersResponse = customerOperations.GetPagedCustomersByEmployeeRecId(pagedCustomer);
+
+            return Ok(customersResponse);
+        }
+
+        [HttpGet]
+        [Route("count/{employeeRecId}")]
+        public IActionResult GetCustomersCountByStaffRecId(String employeeRecId)
+        {
+            long id = Convert.ToInt64(employeeRecId);
+
+            var customerOperations = new CustomerOperations(_configuration);
+
+            var customersCountResponse = customerOperations.GetCustomersCount(id);
+
+            return Ok(customersCountResponse);
         }
     }
 }

@@ -84,6 +84,32 @@ namespace GeofencingWebApi.Controllers
         }
 
         [HttpGet]
+        [Route("lastSalesOrder/{staffRecId}")]
+        public IActionResult GetLastSalesOrderByStaffRecId(string staffRecId)
+        {
+            long staffrecid;
+
+            if (staffRecId == null)
+            {
+                return BadRequest("Staff Rec ID is missing!");
+            }
+
+            try
+            {
+                staffrecid = Convert.ToInt64(staffRecId);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Couldn't cast Staff Rec ID");
+            }
+
+            var salesOrderOperations = new SalesOrderOperations(_configuration);
+            var salesOrderResponse = salesOrderOperations.GetLastSalesOrderByStaffRecId(staffrecid);
+
+            return Ok(salesOrderResponse);
+        }
+
+        [HttpGet]
         [Route("types")]
         public IActionResult GetSalesOrderTypes()
         {
@@ -113,12 +139,13 @@ namespace GeofencingWebApi.Controllers
             return Ok(salesOrdersCount);
         }
 
-        [HttpPost]
-        [Route("paged")]
-        public IActionResult PagedSalesOrders(PagedSalesOrder pagedSalesOrder)
+        [HttpGet]
+        [Route("paged/{pageNumber}/{hcmWorkerRecId}")]
+        public IActionResult PagedSalesOrders(int pageNumber, String hcmWorkerRecId)
         {
             var salesOrderOperations = new SalesOrderOperations(_configuration);
-            var pagedSalesOrdersResponse = salesOrderOperations.GetPagedSalesOrders(pagedSalesOrder);
+           
+            var pagedSalesOrdersResponse = salesOrderOperations.GetPagedSalesOrders(pageNumber, hcmWorkerRecId);
 
             return Ok(pagedSalesOrdersResponse);
         }
