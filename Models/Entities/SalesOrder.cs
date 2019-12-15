@@ -59,6 +59,7 @@ namespace GeofencingWebApi.Models.Entities
         /// </summary>
         [Required]
         public string SalesAgentLatitude { get; set; }
+        public string TotalDiscountPercentage { get; set; }
     }
 
     public class SalesOrderForSave
@@ -78,6 +79,7 @@ namespace GeofencingWebApi.Models.Entities
         public string SalesAgentLongitude { get; set; }
         [Required]
         public string SalesAgentLatitude { get; set; }
+        public double TotalDiscountPercentage { get; set; }
         //public string Token { get; set; }
     }
 }

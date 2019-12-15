@@ -62,6 +62,7 @@ namespace GeofencingWebApi.Business
                         SalesAgentLongitude = salesOrder.SalesAgentLongitude,
                         InventLocationId = salesOrder.InventLocationId,
                         SalesName = salesOrder.SalesName,
+                        TotalDiscountPercentage = Convert.ToDouble(salesOrder.TotalDiscountPercentage),
                         SalesType = "Sales",
                         UniqueId = helper.GenerateUniqueKey(45)
                         //SalesType = salesOrder.SalesType
@@ -395,11 +396,7 @@ namespace GeofencingWebApi.Business
             {
                 SalesOrderItem salesOrderItem;
 
-                salesOrderItem = salesOrderResponseItem;
-                if (salesOrderResponseItem.SalesOrderStatus == "Backorder")
-                {
-                    salesOrderItem.SalesOrderStatus = "Open Order";
-                }
+                salesOrderItem = this.formatSalesOrderItem(salesOrderResponseItem);
 
                 var nigerianDateTime = helper.ConvertToNigerianTime(salesOrderItem.CreatedOn);
                 salesOrderItem.CreatedOn = nigerianDateTime;
@@ -408,6 +405,49 @@ namespace GeofencingWebApi.Business
             }
 
             return finalSalesOrderResponseList;
+        }
+
+        private SalesOrderItem formatSalesOrderItem(SalesOrderItem salesOrderItemToFormat)
+        {
+            SalesOrderItem salesOrderItem;
+
+            if (salesOrderItemToFormat.SalesOrderStatus == "Backorder")
+            {
+                salesOrderItemToFormat.SalesOrderStatus = "Open Order";
+            }
+
+            if (salesOrderItemToFormat.WorkflowStatus == "NotSubmitted")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Draft";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "PendingApproval")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "In Review";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "ChangeRequested")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Change requested";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "Approved")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Approved";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "Rejected")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Rejected";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "Returned")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Returned";
+            }
+            else if (salesOrderItemToFormat.WorkflowStatus == "Cancelled")
+            {
+                salesOrderItemToFormat.WorkflowStatus = "Cancelled";
+            }
+
+            salesOrderItem = salesOrderItemToFormat;
+
+            return salesOrderItem;
         }
 
     }

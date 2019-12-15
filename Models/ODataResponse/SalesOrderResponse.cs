@@ -51,5 +51,6 @@ namespace GeofencingWebApi.Models.ODataResponse
         public DateTime CreatedOn { get; set; }
         //public string PersonnelNumber { get; set; }
         public string SalesOrderStatus { get; set; }
+        public string WorkflowStatus { get; set; }
     }
 }
