@@ -27,3 +27,18 @@ Path 'value', line 2, position 158.
 2019-12-09 18:39:08.316 +01:00 [ERR] Could not convert string to integer: 2019-12-05T12:00:00Z. Path 'value[0].PaymentDate', line 4, position 208.
 2019-12-09 18:49:16.340 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
 2019-12-09 18:50:29.800 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2019-12-22 16:14:44.949 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 20:42:37.980 +01:00 [ERR] Response status code does not indicate success: 400 (Bad Request).
+2019-12-22 20:43:22.371 +01:00 [ERR] Response status code does not indicate success: 400 (Bad Request).
+2019-12-22 20:45:23.575 +01:00 [ERR] Response status code does not indicate success: 400 (Bad Request).
+2019-12-22 20:48:33.184 +01:00 [ERR] Response status code does not indicate success: 400 (Bad Request).
+2019-12-22 20:59:53.134 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:00:35.302 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:11:58.360 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:24:03.903 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:26:04.640 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:26:47.155 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:27:25.270 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:32:18.832 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:34:29.847 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-22 21:35:18.203 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.

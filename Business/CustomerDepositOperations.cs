@@ -17,7 +17,11 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private string customerdepositcreate, customerdepositbyemployeeid, customerdepositcount;
-        private string jsonResponse, pagedcustomerdeposits, deletecustomerdposit, credittable;
+        private string jsonResponse;
+        private string pagedcustomerdeposits;
+        private string deletecustomerdposit;
+        private string credittable;
+        private readonly string t;
         private int resultsperpage;
 
         public CustomerDepositOperations(IConfiguration configuration)
@@ -30,6 +34,70 @@ namespace GeofencingWebApi.Business
             resultsperpage = Convert.ToInt32(_configuration.GetSection("Variables").GetSection("resultsperpage").Value);
             deletecustomerdposit = _configuration.GetSection("Endpoints").GetSection("depositdelete").Value;
             credittable = _configuration.GetSection("Endpoints").GetSection("credittable").Value;
+            t = _configuration.GetSection("Endpoints").GetSection("territories").Value;
+        }
+
+        public async Task<bool> SaveTerritoryAsync(Territory customerDeposit)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+            bool customerDepositResponse = true;
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.BaseAddress = new Uri(currentEnvironment);
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token);
+                    client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+
+                    var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
+
+                    var customerDepositForSave = new TerritoryInfoForSave()
+                    {
+                        LocalGovernment = customerDeposit.LocalGovernment,
+                        Location = customerDeposit.Location,
+                        Name = customerDeposit.Name,
+                        Population = customerDeposit.Population,
+                        Region = customerDeposit.Region,
+                        State = customerDeposit.State
+                    };
+
+                    try
+                    {
+                        var response = await client.PostAsJsonAsync(t, customerDepositForSave);
+                        // var d = response.EnsureSuccessStatusCode().Content;
+
+                        bool returnValue = await response.Content.ReadAsAsync<bool>();
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                        throw;
+                    }
+                    //HttpResponseMessage responseMessage = client.PostAsJsonAsync(t, customerDepositForSave).Result;
+                    //var resp = client.PostAsJsonAsync(t, customerDepositForSave);
+
+                    //if (!responseMessage.IsSuccessStatusCode)
+                    //{
+                    //    return false;
+                    //}
+
+                    //salesOrderResponse = responseMessage.Content.ReadAsAsync<CreateSalesOrderResponse>().Result;
+                    // return responseMessage.Content.ReadAsAsync<SalesOrderResponse>().Result;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return customerDepositResponse;
         }
 
         public bool Save(CustomerDeposit customerDeposit)

@@ -28,5 +28,15 @@ namespace GeofencingWebApi.Controllers
 
             return Ok(statesResponse);
         }
+
+        [HttpGet]
+        [Route("region/{region}")]
+        public IActionResult GetStatesByRegion(string region)
+        {
+            var statesOperations = new StatesOperations(_configuration);
+            var statesResponse = statesOperations.GetStatesByRegion(region);
+
+            return Ok(statesResponse);
+        }
     }
 }

@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace GeofencingWebApi.Models.Entities
 {
-    public class StateData
+    public class LgaData
     {
-        public string State { get; set; }
-        public string StateCode { get; set; }
-        public string Region { get; set; }
+        public string LgaCode { get; set; }
+        public string LgaName { get; set; }
     }
 }
