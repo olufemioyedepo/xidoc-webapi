@@ -7,7 +7,9 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -17,7 +19,7 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private readonly string employees, geolocationparameters, salesagents, single_employee;
-        private string jsonResponse;
+        private string jsonResponse, employeeterritorycount;
 
         public EmployeeOperations(IConfiguration configuration)
         {
@@ -26,6 +28,7 @@ namespace GeofencingWebApi.Business
             geolocationparameters = _configuration.GetSection("Endpoints").GetSection("geolocationparameters").Value;
             salesagents = _configuration.GetSection("Endpoints").GetSection("salesagents").Value;
             single_employee = _configuration.GetSection("Endpoints").GetSection("single_employee").Value;
+            employeeterritorycount = _configuration.GetSection("Endpoints").GetSection("employeeterritorycount").Value;
         }
 
         public List<EmployeeWorker> GetEmployees()
@@ -270,5 +273,62 @@ namespace GeofencingWebApi.Business
 
             return singleEmployee;
         }
+
+        /// <summary>
+        /// Accepts the Employee Id and uses it to carry out a count operaton of territories that the Employee is associated with
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <returns>An integer count of territories that the Employee falls under/belongs to</returns>
+        public async Task<int> GetEmployeeTerritoriesCount(string employeeId)
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+
+            //string formattedEmployeeId = employeeId.Replace("-", "/");
+            //string url = 
+            //
+            string endpoint = currentEnvironment + employeeterritorycount;
+            string formattedEndpoint = String.Format(endpoint, employeeId);
+
+            int employeeTerritoryCountResponse = 0;
+
+            try
+            {
+                var webRequest = System.Net.WebRequest.Create(formattedEndpoint);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    // Get the stream containing all content returned by the requested server.
+                    Stream dataStream = response.GetResponseStream();
+
+                    // Open the stream using a StreamReader for easy access.
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    // Read the content fully up to the end.
+                    jsonResponse = reader.ReadToEnd();
+
+                    employeeTerritoryCountResponse = JsonConvert.DeserializeObject<int>(jsonResponse);
+
+                    response.Close();
+                    response.Dispose();
+                    dataStream.Close();
+                    reader.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return employeeTerritoryCountResponse;
+        }
+
     }
 }

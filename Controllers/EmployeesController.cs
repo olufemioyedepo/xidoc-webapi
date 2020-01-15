@@ -75,5 +75,20 @@ namespace GeofencingWebApi.Controllers
 
             return Ok(employeeResponse);
         }
+
+        [HttpPost]
+        [Route("issalesagent")]
+        public async Task<IActionResult> GetEmployeeTerritoriesCount(PersonnelNumber personnelNumber)
+        {
+            var employeeOperations = new EmployeeOperations(_configuration);
+            var employeeTerritoryCount = await employeeOperations.GetEmployeeTerritoriesCount(personnelNumber.Value);
+
+            if (employeeTerritoryCount == 0)
+            {
+                return Ok(false);
+            }
+            
+            return Ok(true);
+        }
     }
 }
