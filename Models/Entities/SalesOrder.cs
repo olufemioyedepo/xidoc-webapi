@@ -51,13 +51,13 @@ namespace GeofencingWebApi.Models.Entities
         /// <summary>
         /// The Longitude coordinate of the agent making the sales order
         /// </summary>
-        [Required]
+        //[Required]
         public string SalesAgentLongitude { get; set; }
 
         /// <summary>
         /// The Latitutude coordinate of the agent making the sales order
         /// </summary>
-        [Required]
+        //[Required]
         public string SalesAgentLatitude { get; set; }
         public string TotalDiscountPercentage { get; set; }
     }
@@ -75,9 +75,9 @@ namespace GeofencingWebApi.Models.Entities
         public string SalesType { get; set; }
         //public string InventSiteId { get; set; }
         public string InventLocationId { get; set; }
-        [Required]
+        //[Required]
         public string SalesAgentLongitude { get; set; }
-        [Required]
+        //[Required]
         public string SalesAgentLatitude { get; set; }
         public double TotalDiscountPercentage { get; set; }
         //public string Token { get; set; }

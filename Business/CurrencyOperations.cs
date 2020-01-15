@@ -15,7 +15,7 @@ namespace GeofencingWebApi.Business
     public class CurrencyOperations
     {
         readonly IConfiguration _configuration;
-        private string currenciesendpoint;
+        private readonly string currenciesendpoint;
         private string jsonResponse;
 
         public CurrencyOperations(IConfiguration configuration)

@@ -22,6 +22,15 @@ namespace GeofencingWebApi.Models.ODataResponse
         public string SalesAgentLatitude { get; set; }
     }
 
+    public class SalesLineCreateResponse
+    {
+        public string SalesOrderNumber { get; set; }
+        public string ItemNumber { get; set; }
+        public int LineDiscountPercentage { get; set; }
+        public string ShippingWarehouseId { get; set; }
+        public int OrderedSalesQuantity { get; set; }
+    }
+
     public class SalesLineListItem
     {
         //[JsonProperty("@odata.etag")]
@@ -34,6 +43,8 @@ namespace GeofencingWebApi.Models.ODataResponse
         //public DateTime RequestedReceiptDate { get; set; }
         public DateTime CreatedOn { get; set; }
         public double SalesPrice { get; set; }
+        public double LineDiscountAmount { get; set; }
+        public double LineDiscountPercentage { get; set; }
         public double LineAmount { get; set; }
         public int OrderedSalesQuantity { get; set; }
         public long SalesLineRecId { get; set; }

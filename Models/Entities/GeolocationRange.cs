@@ -24,4 +24,12 @@ namespace GeofencingWebApi.Models.Entities
         public string AgentLongitude { get; set; }
         public double Radius { get; set; }
     }
+
+    public class RangeCheckParam
+    {
+        public string EmployeeId { get; set; }
+        public string AgentLatitude { get; set; }
+        public string AgentLongitude { get; set; }
+
+    }
 }

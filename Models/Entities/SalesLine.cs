@@ -9,25 +9,27 @@ namespace GeofencingWebApi.Models.Entities
     public class SalesLine
     {
         //public string CustAccount { get; set; }
-        public double SalesPrice { get; set; }
-        public DateTime DateTimeCreated { get; set; }
+        //public double SalesPrice { get; set; }
+        //public DateTime DateTimeCreated { get; set; }
         [Required]
-        public string SalesId { get; set; }
+        public string SalesOrderNumber { get; set; }
         [Required]
-        public double SalesQty { get; set; }
-        public double LineDisc { get; set; }
-        public double PriceUnit { get; set; }
+        public int OrderedSalesQuantity { get; set; }
+        public string LineDiscountPercentage { get; set; }
+        public string LineDiscountAmount { get; set; }
+        //public double PriceUnit { get; set; }
         [Required]
-        public string Warehouse { get; set; }
-        public string ItemId { get; set; }
+        public string ShippingWarehouseId { get; set; }
+        [Required]
+        public string ItemNumber { get; set; }
         //[Required]
         //public string CreatorId { get; set; }
         //[Required]
-        public string PersonnelNumber { get; set; }
-        [Required]
-        public string SalesAgentLongitude { get; set; }
-        [Required]
-        public string SalesAgentLatitude { get; set; }
+        //public string PersonnelNumber { get; set; }
+        //[Required]
+        //public string SalesAgentLongitude { get; set; }
+        //[Required]
+        //public string SalesAgentLatitude { get; set; }
     }
 
     public class SalesLineForSave
@@ -47,7 +49,18 @@ namespace GeofencingWebApi.Models.Entities
         public string SalesAgentLatitude { get; set; }
     }
 
-    
+    public class SalesLineCreate
+    {
+        public string SalesOrderNumber { get; set; }
+        public string ItemNumber { get; set; }
+        public double LineDiscountPercentage { get; set; }
+        public double LineDiscountAmount { get; set; }
+        public string ShippingWarehouseId { get; set; }
+        public int OrderedSalesQuantity { get; set; }
 
-    
+    }
+
+
+
+
 }

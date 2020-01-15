@@ -42,3 +42,29 @@ Path 'value', line 2, position 158.
 2019-12-22 21:32:18.832 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
 2019-12-22 21:34:29.847 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
 2019-12-22 21:35:18.203 +01:00 [ERR] Unexpected character encountered while parsing value: {. Path '', line 1, position 1.
+2019-12-28 10:32:22.626 +01:00 [ERR] No such host is known No such host is known
+2019-12-28 10:34:46.379 +01:00 [ERR] No such host is known No such host is known
+2019-12-29 10:11:45.357 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:11:45.953 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:11:46.519 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:12:33.213 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:12:33.790 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:12:34.314 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:13:06.240 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:13:06.748 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2019-12-29 10:13:07.259 +01:00 [ERR] Index was out of range. Must be non-negative and less than the size of the collection.
+Parameter name: index
+2020-01-02 23:09:42.797 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2020-01-02 23:10:13.044 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2020-01-02 23:11:28.675 +01:00 [ERR] The remote server returned an error: (400) Bad Request.
+2020-01-02 23:59:52.028 +01:00 [ERR] Object reference not set to an instance of an object.
+2020-01-03 00:00:47.871 +01:00 [ERR] Object reference not set to an instance of an object.
+2020-01-07 11:20:43.210 +01:00 [ERR] The remote server returned an error: (404) Not Found.

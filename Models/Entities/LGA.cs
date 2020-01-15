@@ -10,4 +10,9 @@ namespace GeofencingWebApi.Models.Entities
         public string LgaCode { get; set; }
         public string LgaName { get; set; }
     }
+
+    public class Lga
+    {
+        public string Name { get; set; }
+    }
 }

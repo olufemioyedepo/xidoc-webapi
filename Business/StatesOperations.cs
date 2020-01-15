@@ -19,6 +19,7 @@ namespace GeofencingWebApi.Business
         public StatesOperations(IConfiguration configuration)
         {
             _configuration = configuration;
+            nigerianstates = _configuration.GetSection("Endpoints").GetSection("nigerianstates").Value;
             nigerianstatesbyregion = _configuration.GetSection("Endpoints").GetSection("nigerianstatesbyregion").Value;
             lgasbystatecode = _configuration.GetSection("Endpoints").GetSection("lga").Value;
         }
@@ -58,7 +59,7 @@ namespace GeofencingWebApi.Business
             }
             catch (Exception ex)
             {
-                //Log.Error(ex.Message);
+                Log.Error(ex.Message);
             }
 
             return statesResponseList.OrderBy(s => s.State).ToList();
@@ -126,6 +127,7 @@ namespace GeofencingWebApi.Business
             string url = currentEnvironment + lgasbystatecode;
             string formattedUrl = String.Format(url, stateCode);
 
+
             var lgasResponseList = new List<LgaData>();
 
             try
@@ -154,6 +156,13 @@ namespace GeofencingWebApi.Business
             {
                 Log.Error(ex.Message);
             }
+
+            //var allLga = new LgaData()
+            //{
+            //    LgaCode = "All",
+            //    LgaName = " All Local Governments"
+            //};
+            //lgasResponseList.Add(allLga);
 
             return lgasResponseList.OrderBy(s => s.LgaName).ToList();
         }
