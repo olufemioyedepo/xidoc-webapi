@@ -18,26 +18,27 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private readonly string saleslinecreate, saleslinecancel, saleslinebyordernumber, saleslinecount;
-        private string jsonResponse;
+        private string jsonResponse, salesorderlines;
 
         public SalesLineOperations(IConfiguration configuration)
         {
             _configuration = configuration;
             saleslinecreate = _configuration.GetSection("Endpoints").GetSection("saleslinecreate").Value;
             saleslinecancel = _configuration.GetSection("Endpoints").GetSection("saleslinecancel").Value;
+            salesorderlines = _configuration.GetSection("Endpoints").GetSection("salesorderlines").Value;
             saleslinebyordernumber = _configuration.GetSection("Endpoints").GetSection("saleslinebyordernumber").Value;
             saleslinecount = _configuration.GetSection("Endpoints").GetSection("saleslinebyordernumber").Value;
         }
 
-        public SalesLineItemResponse Save(SalesLine salesLine)
+        public async Task<bool> CreateSalesLine(SalesLine salesLine)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
 
             string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
-            var salesLineItemResponse = new SalesLineItemResponse();
-
+            //var salesLineItemResponse = new SalesLineItemResponse();
+            bool salesLineCreateResponse = false;
             try
             {
                 using (var client = new HttpClient())
@@ -49,30 +50,24 @@ namespace GeofencingWebApi.Business
 
                     var dateTimeCreated = TimeZoneInfo.ConvertTime(DateTime.Now, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
 
-                    var salesLineForSave = new SalesLineForSave()
+                    var salesLineForSave = new SalesLineCreate()
                     {
-                        SalesId = salesLine.SalesId,
-                        Warehouse = salesLine.Warehouse,
-                        ItemId = salesLine.ItemId,
-                        DateTimeCreated = DateTime.Now,
-                        //PersonnelNumber = salesLine.PersonnelNumber,
-                        LineDisc = salesLine.LineDisc,
-                        SalesQty = salesLine.SalesQty,
-                        PriceUnit = salesLine.PriceUnit,
-                        //SalesPrice = salesLine.SalesPrice,
-                        SalesAgentLatitude = salesLine.SalesAgentLatitude,
-                        SalesAgentLongitude = salesLine.SalesAgentLongitude,
-                        UniqueId = helper.GenerateUniqueKey(45)
+                        ItemNumber = salesLine.ItemNumber,
+                        LineDiscountPercentage = String.IsNullOrEmpty(salesLine.LineDiscountPercentage) ? 0.0 : Convert.ToDouble(salesLine.LineDiscountPercentage),
+                        LineDiscountAmount = String.IsNullOrEmpty(salesLine.LineDiscountAmount) ? 0.0 : Convert.ToDouble(salesLine.LineDiscountAmount),
+                        OrderedSalesQuantity = salesLine.OrderedSalesQuantity,
+                        SalesOrderNumber = salesLine.SalesOrderNumber,
+                        ShippingWarehouseId = salesLine.ShippingWarehouseId
                     };
 
-                    HttpResponseMessage responseMessage = client.PostAsJsonAsync(saleslinecreate, salesLineForSave).Result;
+                    var responseMessage = await client.PostAsJsonAsync(salesorderlines, salesLineForSave);
 
-                    if (!responseMessage.IsSuccessStatusCode)
+                    if (responseMessage.IsSuccessStatusCode)
                     {
-                        return null;
+                        salesLineCreateResponse = true;
                     }
 
-                    salesLineItemResponse = responseMessage.Content.ReadAsAsync<SalesLineItemResponse>().Result;
+                    // var salesLineCreateResponse = responseMessage.Content.ReadAsAsync<SalesLineCreateResponse>().Result;
                     // return responseMessage.Content.ReadAsAsync<SalesLineItemResponse>().Result;
                 }
             }
@@ -81,9 +76,8 @@ namespace GeofencingWebApi.Business
                 Log.Error(ex.Message);
             }
 
-            return salesLineItemResponse;
+            return salesLineCreateResponse;
         }
-
         public List<SalesLineListItem> GetSalesLinesBySalesOrderNumber(string salesOrderNumber)
         {
             var helper = new Helper(_configuration);

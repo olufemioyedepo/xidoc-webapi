@@ -22,8 +22,27 @@ namespace GeofencingWebApi.Controllers
             _configuration = configuration;
         }
 
+        //[HttpPost]
+        //public IActionResult Post(SalesLine salesLineInfo)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest("One of the required fields is missing!");
+        //    }
+
+        //    var salesLineOperations = new SalesLineOperations(_configuration);
+        //    var salesLineResponse = salesLineOperations.Save(salesLineInfo);
+
+        //    if (salesLineResponse == null)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    return Created("createsalesline", salesLineResponse);
+        //}
+
         [HttpPost]
-        public IActionResult Post(SalesLine salesLineInfo)
+        public async Task<IActionResult> Post(SalesLine salesLineInfo)
         {
             if (!ModelState.IsValid)
             {
@@ -31,11 +50,11 @@ namespace GeofencingWebApi.Controllers
             }
 
             var salesLineOperations = new SalesLineOperations(_configuration);
-            var salesLineResponse = salesLineOperations.Save(salesLineInfo);
+            var salesLineResponse = await salesLineOperations.CreateSalesLine(salesLineInfo);
 
-            if (salesLineResponse == null)
+            if (salesLineResponse == false)
             {
-                return BadRequest();
+                return BadRequest("Could not create Sales line. An error occurred");
             }
 
             return Created("createsalesline", salesLineResponse);
