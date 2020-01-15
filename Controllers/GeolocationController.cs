@@ -35,7 +35,7 @@ namespace GeofencingWebApi.Controllers
             var fullgeolocationdetails = new FullGeolocationParameters();
             fullgeolocationdetails.CurrentGeolocationLatitude = geolocationParameters.CurrentGeolocationLatitude;
             fullgeolocationdetails.CurrentGeolocationLongitude = geolocationParameters.CurrentGeolocationLongitude;
-            
+
             if (employeeShortInfo != null)
             {
                 fullgeolocationdetails.AgentLatitude = employeeShortInfo.SalesAgentLatitude;
@@ -46,6 +46,16 @@ namespace GeofencingWebApi.Controllers
             var withinRangeResponse = geolocationOperations.IsAgentWithinRange(fullgeolocationdetails);
 
             return Ok(withinRangeResponse);
+        }
+
+        [HttpPost]
+        [Route("agentwithinrange")]
+        public async Task<IActionResult> IsSalesAgentWithinRange(RangeCheckParam rangeCheckParam)
+        {
+            var geolocationOperations = new GeolocationOperations(_configuration);
+            var agentWithinRange = await geolocationOperations.IsAgentWithinSalesPolygon(rangeCheckParam);
+
+            return Ok(agentWithinRange);
         }
     }
 }
