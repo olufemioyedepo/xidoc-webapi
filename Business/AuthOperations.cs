@@ -131,6 +131,65 @@ namespace GeofencingWebApi.Business
             return employeeWorker;
         }
 
+
+        public async Task<Worker> DoLogin(EmployeeEmail employeeEmail)
+        {
+            string formattedEndpoint = String.Format(employeelogin, employeeEmail.Email);
+
+            var helper = new Helper(_configuration);
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + formattedEndpoint;
+
+            var employeeWorker = new Worker();
+            var workerResponse = new WorkerResponse();
+
+            try
+            {
+                var webRequest = WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + employeeEmail.Token);
+
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    employeeresponse = reader.ReadToEnd();
+
+                    //var employeesInTerritoryResponse = new EmployeeInTerritoryListResponse();
+                    workerResponse = JsonConvert.DeserializeObject<WorkerResponse>(employeeresponse);
+
+                    employeeWorker = workerResponse.value.ElementAt(0);
+
+                    //using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                    //{
+                    //    using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                    //    {
+                    //        employeeresponse = sr.ReadToEnd();
+                    //        workerResponse = JsonConvert.DeserializeObject<WorkerResponse>(employeeresponse);
+                    //        employeeWorker = workerResponse.value.ElementAt(0);
+                    //    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            if (workerResponse.value == null)
+            {
+                return null;
+            }
+            if (workerResponse.value.Count == 0)
+            {
+                return null;
+            }
+
+            return employeeWorker;
+        }
         public string HttpPostRequest(string url)
         {
             string postData = "";

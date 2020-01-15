@@ -95,7 +95,7 @@ namespace GeofencingWebApi.Controllers
 
         [HttpPost]
         [Route("login")]
-        public IActionResult Login(LoginModel loginModel)
+        public async Task<IActionResult> Login(LoginModel loginModel)
         {
             if (!ModelState.IsValid)
             {
@@ -119,9 +119,10 @@ namespace GeofencingWebApi.Controllers
                 Email = loginModel.Email,
                 Token = token
             };
-            
 
-            var employeeWorkerResponse = authOperation.Login(employeeEmail);
+
+            var employeeWorkerResponse = await authOperation.DoLogin(employeeEmail);
+            // var employeeWorkerResponse = authOperation.Login(employeeEmail);
 
             if (employeeWorkerResponse == null)
             {
