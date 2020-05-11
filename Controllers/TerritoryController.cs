@@ -52,11 +52,11 @@ namespace GeofencingWebApi.Controllers
         }
 
         [HttpGet]
-        [Route("bylocalgovernment/{localgovernment}")]
-        public IActionResult GetTerritories(string localgovernment)
+        [Route("bystatelocalgovernment/{state}/{localgovernment}")]
+        public IActionResult GetTerritories(string state, string localgovernment)
         {
             var territoryOperations = new TerritoryOperations(_configuration);
-            var lgasInTerritory = territoryOperations.GetTerritoriesByLocalGovernment(localgovernment);
+            var lgasInTerritory = territoryOperations.GetTerritoriesByLocalGovernment(state, localgovernment);
 
             return Ok(lgasInTerritory);
         }

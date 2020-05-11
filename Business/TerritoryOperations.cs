@@ -180,7 +180,7 @@ namespace GeofencingWebApi.Business
             return territoryCreateResponse;
         }
 
-        public List<TerritoryResponse> GetTerritoriesByLocalGovernment(string localGovernment)
+        public List<TerritoryResponse> GetTerritoriesByLocalGovernment(string state, string localGovernment)
         {
             if (!String.IsNullOrEmpty(localGovernment))
             {
@@ -193,7 +193,7 @@ namespace GeofencingWebApi.Business
             string token = authOperation.GetAuthToken();
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + territoriesbylga;
-            string formattedUrl = String.Format(url, localGovernment);
+            string formattedUrl = String.Format(url, state, localGovernment);
 
             var lgasResponseList = new List<TerritoryResponse>();
 

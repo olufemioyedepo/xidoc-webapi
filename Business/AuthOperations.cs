@@ -44,8 +44,9 @@ namespace GeofencingWebApi.Business
                     data["grant_type"] = "client_credentials";
                     data["client_id"] = "c11b33c6-1e65-4e0b-adc1-bd1e5ea0cdb4";
                     data["client_secret"] = "6CP/?s6yHlbY=9wNG[PPl3ot=w64drqk";
-                    //data["resource"] = "https://codix-sat.sandbox.operations.dynamics.com";
-                    data["resource"] = "https://codix-devdevaos.sandbox.ax.dynamics.com";
+                    // data["resource"] = "https://codix-sat.sandbox.operations.dynamics.com";
+                    //data["resource"] = "https://codix-devdevaos.sandbox.ax.dynamics.com";
+                    data["resource"] = "https://codix.operations.dynamics.com";
 
                     string url = _configuration.GetSection("AuthConfig").GetSection("url").Value;
 

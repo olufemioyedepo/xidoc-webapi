@@ -20,10 +20,10 @@ namespace GeofencingWebApi.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var customerOperations = new CustomerOperations(_configuration);
-            var customerGroups = customerOperations.GetCustomerGroups();
+            var customerGroups = await customerOperations.GetCustomerGroups();
 
             return Ok(customerGroups);
         }

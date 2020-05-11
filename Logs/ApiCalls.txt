@@ -68,3 +68,15 @@ Parameter name: index
 2020-01-02 23:59:52.028 +01:00 [ERR] Object reference not set to an instance of an object.
 2020-01-03 00:00:47.871 +01:00 [ERR] Object reference not set to an instance of an object.
 2020-01-07 11:20:43.210 +01:00 [ERR] The remote server returned an error: (404) Not Found.
+2020-01-16 11:57:42.827 +01:00 [ERR] The remote server returned an error: (502) Bad Gateway.
+2020-01-19 21:44:33.322 +01:00 [ERR] No such host is known No such host is known
+2020-01-19 21:44:58.501 +01:00 [ERR] No such host is known No such host is known
+2020-01-19 21:48:19.687 +01:00 [ERR] No such host is known No such host is known
+2020-01-19 21:49:50.557 +01:00 [ERR] No such host is known No such host is known
+2020-01-19 21:56:28.872 +01:00 [ERR] An error occurred while sending the request. Unable to read data from the transport connection: An existing connection was forcibly closed by the remote host.
+2020-01-19 22:23:51.135 +01:00 [ERR] A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond A connection attempt failed because the connected party did not properly respond after a period of time, or established connection failed because connected host has failed to respond
+2020-01-24 14:27:07.132 +01:00 [ERR] Cannot deserialize the current JSON object (e.g. {"name":"value"}) into type 'System.Int64' because the type requires a JSON primitive value (e.g. string, number, boolean, null) to deserialize correctly.
+To fix this error either change the JSON to a JSON primitive value (e.g. string, number, boolean, null) or change the deserialized type so that it is a normal .NET type (e.g. not a primitive type like integer, not a collection type like an array or List<T>) that can be deserialized from a JSON object. JsonObjectAttribute can also be added to the type to force it to deserialize from a JSON object.
+Path '['@odata.context']', line 2, position 19.
+2020-02-08 15:41:11.717 +01:00 [ERR] No such host is known No such host is known
+2020-02-08 15:41:27.376 +01:00 [ERR] No such host is known No such host is known

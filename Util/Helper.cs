@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using GeofencingWebApi.Models.DTOs;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -55,6 +56,32 @@ namespace GeofencingWebApi.Util
             }
 
             return convertedDateTime = TimeZoneInfo.ConvertTime(dateTime, TimeZoneInfo.FindSystemTimeZoneById("W. Central Africa Standard Time"));
+        }
+
+        public List<TerritorySalesRep> GetDistinctSalesReps(List<TerritorySalesRep> salesRepsList)
+        {
+            bool repExists = false;
+
+            List<TerritorySalesRep> finalRepsList = new List<TerritorySalesRep>();
+            foreach (var salesRep in salesRepsList)
+            {
+                foreach (var item in finalRepsList)
+                {
+                    repExists = false;
+                    // if employee id already exist
+                    if (item.EmployeeId == salesRep.EmployeeId)
+                    {
+                        repExists = true;
+                        break;
+                    }
+                }
+                if (repExists == false)
+                {
+                    finalRepsList.Add(salesRep);
+                }
+            }
+
+            return finalRepsList;
         }
     }
 }

@@ -11,6 +11,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.IdentityModel.Tokens.Jwt;
 using Serilog;
+using System.Net;
+using System.IO;
 
 namespace GeofencingWebApi.Business
 {
@@ -78,7 +80,7 @@ namespace GeofencingWebApi.Business
 
             return salesLineCreateResponse;
         }
-        public List<SalesLineListItem> GetSalesLinesBySalesOrderNumber(string salesOrderNumber)
+        public async Task<List<SalesLineListItem>> GetSalesLinesBySalesOrderNumber(string salesOrderNumber)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -95,25 +97,32 @@ namespace GeofencingWebApi.Business
 
             try
             {
-                var webRequest = System.Net.WebRequest.Create(formattedUrl);
+                var webRequest = WebRequest.Create(formattedUrl);
+
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var salesLinesResponse = new SalesLineListResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            salesLinesResponse = JsonConvert.DeserializeObject<SalesLineListResponse>(jsonResponse);
-                            saleLineResponseList = salesLinesResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    var salesLinesResponse = new SalesLineListResponse();
+                    jsonResponse = reader.ReadToEnd();
+
+                    salesLinesResponse = JsonConvert.DeserializeObject<SalesLineListResponse>(jsonResponse);
+                    saleLineResponseList = salesLinesResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
+
             }
             catch (Exception ex)
             {

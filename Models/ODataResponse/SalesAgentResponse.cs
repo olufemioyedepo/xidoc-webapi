@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using GeofencingWebApi.Models.DTOs;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -70,6 +71,13 @@ namespace GeofencingWebApi.Models.ODataResponse
         [JsonProperty("@odata.etag")]
         public string odataetag { get; set; }
         public List<SalesAgentListItem> value { get; set; }
+    }
+
+    public class SalesRepsResponse
+    {
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+        public List<TerritorySalesRep> value { get; set; }
     }
 
 }

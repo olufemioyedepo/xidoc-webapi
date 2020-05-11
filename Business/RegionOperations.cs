@@ -34,32 +34,68 @@ namespace GeofencingWebApi.Business
 
             var regionsResponseList = new List<Region>();
 
-            try
+            var southEastRegion = new Region()
             {
-                var webRequest = System.Net.WebRequest.Create(url);
-                if (webRequest != null)
-                {
-                    webRequest.Method = "GET";
-                    webRequest.Timeout = 120000;
-                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+                Name = "South East"
+            };
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var regionsResponse = new RegionsResponse();
-
-                            jsonResponse = sr.ReadToEnd();
-                            regionsResponse = JsonConvert.DeserializeObject<RegionsResponse>(jsonResponse);
-                            regionsResponseList = regionsResponse.value;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
+            var southWestRegion = new Region()
             {
-                Log.Error(ex.Message);
-            }
+                Name = "South West"
+            };
+
+            var southSouthRegion = new Region()
+            {
+                Name = "South South"
+            };
+
+            var northCentralRegion = new Region()
+            {
+                Name = "North Central"
+            };
+
+            var northWestRegion = new Region()
+            {
+                Name = "North West"
+            };
+
+            var northEastRegion = new Region()
+            {
+                Name = "North East"
+            };
+
+            regionsResponseList.Add(southEastRegion);
+            regionsResponseList.Add(southWestRegion);
+            regionsResponseList.Add(southSouthRegion);
+            regionsResponseList.Add(northCentralRegion);
+            regionsResponseList.Add(northWestRegion);
+            regionsResponseList.Add(northEastRegion);
+            //try
+            //{
+            //    var webRequest = System.Net.WebRequest.Create(url);
+            //    if (webRequest != null)
+            //    {
+            //        webRequest.Method = "GET";
+            //        webRequest.Timeout = 120000;
+            //        webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+            //        using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+            //        {
+            //            using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+            //            {
+            //                var regionsResponse = new RegionsResponse();
+
+            //                jsonResponse = sr.ReadToEnd();
+            //                regionsResponse = JsonConvert.DeserializeObject<RegionsResponse>(jsonResponse);
+            //                regionsResponseList = regionsResponse.value;
+            //            }
+            //        }
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Log.Error(ex.Message);
+            //}
 
             return regionsResponseList.OrderBy(s => s.Name).ToList();
         }

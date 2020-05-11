@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -36,7 +37,7 @@ namespace GeofencingWebApi.Business
             pagedcustomers = _configuration.GetSection("Endpoints").GetSection("pagedcustomers").Value;
         }
 
-        public List<SingleCustomerResponse> GetCustomers()
+        public async Task <List<SingleCustomerResponse>> GetCustomers()
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -49,24 +50,30 @@ namespace GeofencingWebApi.Business
 
             try
             {
-                var webRequest = System.Net.WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
+
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var fetchCustomersResponse = new FetchCustomersResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchCustomersResponse>(jsonResponse);
-                            customersList = fetchCustomersResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    jsonResponse = reader.ReadToEnd();
+
+                    var fetchCustomersResponse = new FetchCustomersResponse();
+                    fetchCustomersResponse = JsonConvert.DeserializeObject<FetchCustomersResponse>(jsonResponse);
+                    customersList = fetchCustomersResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
             }
             catch (Exception ex)
@@ -117,7 +124,7 @@ namespace GeofencingWebApi.Business
             }
         }
 
-        public List<CustomerGroup> GetCustomerGroups()
+        public async Task<List<CustomerGroup>> GetCustomerGroups()
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -130,25 +137,48 @@ namespace GeofencingWebApi.Business
 
             try
             {
-                var webRequest = System.Net.WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var customerGroupsResponse = new CustomerGroupResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            customerGroupsResponse = JsonConvert.DeserializeObject<CustomerGroupResponse>(jsonResponse);
-                            customerGroupResponseList = customerGroupsResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    var customerGroupsResponse = new CustomerGroupResponse();
+                    jsonResponse = reader.ReadToEnd();
+
+                    customerGroupsResponse = JsonConvert.DeserializeObject<CustomerGroupResponse>(jsonResponse);
+                    customerGroupResponseList = customerGroupsResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
+                //if (webRequest != null)
+                //{
+                //    webRequest.Method = "GET";
+                //    webRequest.Timeout = 120000;
+                //    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                //    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                //    {
+                //        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                //        {
+                //            var customerGroupsResponse = new CustomerGroupResponse();
+
+                //            jsonResponse = sr.ReadToEnd();
+                //            customerGroupsResponse = JsonConvert.DeserializeObject<CustomerGroupResponse>(jsonResponse);
+                //            customerGroupResponseList = customerGroupsResponse.value;
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -228,7 +258,7 @@ namespace GeofencingWebApi.Business
             return result;
         }
 
-        public List<V3CustomerResponse> GetCustomersByEmployeeRecId(Int64 employeeRecId)
+        public async Task<List<V3CustomerResponse>> GetCustomersByEmployeeRecId(Int64 employeeRecId)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -242,25 +272,50 @@ namespace GeofencingWebApi.Business
 
             try
             {
-                var webRequest = System.Net.WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
+
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var fetchCustomersResponse = new FetchV3CustomersResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
-                            customersList = fetchCustomersResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    jsonResponse = reader.ReadToEnd();
+
+                    var fetchCustomersResponse = new FetchV3CustomersResponse();
+
+                    fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
+                    customersList = fetchCustomersResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
+                //if (webRequest != null)
+                //{
+                //    webRequest.Method = "GET";
+                //    webRequest.Timeout = 120000;
+                //    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                //    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                //    {
+                //        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                //        {
+                //            var fetchCustomersResponse = new FetchV3CustomersResponse();
+
+                //            jsonResponse = sr.ReadToEnd();
+                //            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
+                //            customersList = fetchCustomersResponse.value;
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {
@@ -270,7 +325,7 @@ namespace GeofencingWebApi.Business
             return customersList.OrderByDescending(s => s.CustomerAccount).ToList();
         }
 
-        public List<V3CustomerResponse> GetPagedCustomersByEmployeeRecId(PagedCustomers pagedCustomers)
+        public async Task<List<V3CustomerResponse>> GetPagedCustomersByEmployeeRecId(PagedCustomers pagedCustomers)
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -293,25 +348,51 @@ namespace GeofencingWebApi.Business
 
             try
             {
-                var webRequest = System.Net.WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
+
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var fetchCustomersResponse = new FetchV3CustomersResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
-                            customersList = fetchCustomersResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    jsonResponse = reader.ReadToEnd();
+
+                    var fetchCustomersResponse = new FetchV3CustomersResponse();
+
+                    fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
+                    customersList = fetchCustomersResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
+
+                //if (webRequest != null)
+                //{
+                //    webRequest.Method = "GET";
+                //    webRequest.Timeout = 120000;
+                //    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                //    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
+                //    {
+                //        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
+                //        {
+                //            var fetchCustomersResponse = new FetchV3CustomersResponse();
+
+                //            jsonResponse = sr.ReadToEnd();
+                //            fetchCustomersResponse = JsonConvert.DeserializeObject<FetchV3CustomersResponse>(jsonResponse);
+                //            customersList = fetchCustomersResponse.value;
+                //        }
+                //    }
+                //}
             }
             catch (Exception ex)
             {

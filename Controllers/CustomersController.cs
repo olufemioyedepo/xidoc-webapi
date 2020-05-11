@@ -24,11 +24,11 @@ namespace GeofencingWebApi.Controllers
 
         [HttpGet]
         [EnableCors("AllowOrigin")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var customerOperations = new CustomerOperations(_configuration);
 
-            var customersResponse = customerOperations.GetCustomers();
+            var customersResponse = await customerOperations.GetCustomers();
 
             return Ok(customersResponse);
         }
@@ -84,20 +84,20 @@ namespace GeofencingWebApi.Controllers
 
         [HttpGet]
         [Route("staffid/{employeeRecId}")]
-        public IActionResult GetCustomersByStaffRecId(String employeeRecId)
+        public async Task<IActionResult> GetCustomersByStaffRecId(String employeeRecId)
         {
             long id = Convert.ToInt64(employeeRecId);
 
             var customerOperations = new CustomerOperations(_configuration);
 
-            var customersResponse = customerOperations.GetCustomersByEmployeeRecId(id);
+            var customersResponse = await customerOperations.GetCustomersByEmployeeRecId(id);
 
             return Ok(customersResponse);
         }
 
         [HttpGet]
         [Route("pagedstaffid/{employeeRecId}/{skipCount}")]
-        public IActionResult GetPagedCustomersByStaffRecId(String employeeRecId, int skipCount)
+        public async Task<IActionResult> GetPagedCustomersByStaffRecId(String employeeRecId, int skipCount)
         {
             long id = Convert.ToInt64(employeeRecId);
             var pagedCustomer = new PagedCustomers()
@@ -108,7 +108,7 @@ namespace GeofencingWebApi.Controllers
 
             var customerOperations = new CustomerOperations(_configuration);
 
-            var customersResponse = customerOperations.GetPagedCustomersByEmployeeRecId(pagedCustomer);
+            var customersResponse = await customerOperations.GetPagedCustomersByEmployeeRecId(pagedCustomer);
 
             return Ok(customersResponse);
         }

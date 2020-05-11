@@ -30,41 +30,50 @@ namespace GeofencingWebApi.Controllers
             return Ok(employeeResponse);
         }
 
-        [HttpPost]
-        [Route("addasagent")]
-        public IActionResult SetGeolocationParameters(SalesAgentPayload salesAgentPayload)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("One of the required field(s) is missing!");
-            }
-
-            var employeeOperations = new EmployeeOperations(_configuration);
-            var geolocationParameterOdataResponse = employeeOperations.CreateEmployeeAsSalesAgent(salesAgentPayload);
-            var geolocationResponse = employeeOperations.FormatOdataResponse(geolocationParameterOdataResponse);
-
-            return Ok(geolocationResponse);
-        }
-
-        [HttpPost]
-        [Route("removeasagent")]
-        public IActionResult RemoveEmployeeAsAgent(RemoveSalesAgentPayload removeSalesAgentPayload)
-        {
-            var employeeOperations = new EmployeeOperations(_configuration);
-            string response = employeeOperations.RemoveEmployeeAsSalesAgent(removeSalesAgentPayload);
-
-            return Ok(response);
-        }
-
         [HttpGet]
-        [Route("salesagents")]
-        public IActionResult GetSalesAgents()
+        [Route("count")]
+        public async Task<IActionResult> SalesOrdersCount()
         {
             var employeeOperations = new EmployeeOperations(_configuration);
-            var employeeResponse = employeeOperations.GetSalesAgents();
+            long employeesCount = await employeeOperations.GetEmployeesCount();
 
-            return Ok(employeeResponse);
+            return Ok(employeesCount);
         }
+        //[HttpPost]
+        //[Route("addasagent")]
+        //public IActionResult SetGeolocationParameters(SalesAgentPayload salesAgentPayload)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest("One of the required field(s) is missing!");
+        //    }
+
+        //    var employeeOperations = new EmployeeOperations(_configuration);
+        //    var geolocationParameterOdataResponse = employeeOperations.CreateEmployeeAsSalesAgent(salesAgentPayload);
+        //    var geolocationResponse = employeeOperations.FormatOdataResponse(geolocationParameterOdataResponse);
+
+        //    return Ok(geolocationResponse);
+        //}
+
+        //[HttpPost]
+        //[Route("removeasagent")]
+        //public IActionResult RemoveEmployeeAsAgent(RemoveSalesAgentPayload removeSalesAgentPayload)
+        //{
+        //    var employeeOperations = new EmployeeOperations(_configuration);
+        //    string response = employeeOperations.RemoveEmployeeAsSalesAgent(removeSalesAgentPayload);
+
+        //    return Ok(response);
+        //}
+
+        //[HttpGet]
+        //[Route("salesagents")]
+        //public IActionResult GetSalesAgents()
+        //{
+        //    var employeeOperations = new EmployeeOperations(_configuration);
+        //    var employeeResponse = employeeOperations.GetSalesAgents();
+
+        //    return Ok(employeeResponse);
+        //}
 
         [HttpGet]
         [Route("recId/{recId}")]
@@ -89,6 +98,16 @@ namespace GeofencingWebApi.Controllers
             }
             
             return Ok(true);
+        }
+
+        [HttpGet]
+        [Route("salesrepscount")]
+        public async Task<IActionResult> GetSalesReps()
+        {
+            var employeeOperations = new EmployeeOperations(_configuration);
+            var employeeTerritoryCount = await employeeOperations.GetSalesRepsCount();
+
+            return Ok(employeeTerritoryCount);
         }
     }
 }

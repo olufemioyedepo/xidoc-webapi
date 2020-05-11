@@ -39,27 +39,27 @@ namespace GeofencingWebApi.Controllers
             return Ok(productsCount);
         }
 
-        [HttpGet]
-        [Route("page/{pageNumber}")]
-        public IActionResult GetPagedProducts(int pageNumber)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest("Required field are missing");
-            }
+        //[HttpGet]
+        //[Route("page/{pageNumber}")]
+        //public IActionResult GetPagedProducts(int pageNumber)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest("Required field are missing");
+        //    }
 
-            var productOperations = new ProductOperations(_configuration);
-            var productResponse = productOperations.GetPagedProducts(pageNumber);
+        //    var productOperations = new ProductOperations(_configuration);
+        //    var productResponse = productOperations.GetPagedProducts(pageNumber);
 
-            return Ok(productResponse);
-        }
+        //    return Ok(productResponse);
+        //}
 
         [HttpGet]
         [Route("released")]
-        public IActionResult GetReleaseProducts()
+        public async Task<IActionResult> GetReleaseProducts()
         {
             var productOperations = new ProductOperations(_configuration);
-            var releasedProductResponse = productOperations.GetReleasedProducts();
+            var releasedProductResponse = await productOperations.GetReleasedProducts();
 
             return Ok(releasedProductResponse);
         }

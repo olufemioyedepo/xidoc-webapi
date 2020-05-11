@@ -19,7 +19,7 @@ namespace GeofencingWebApi.Business
     {
         readonly IConfiguration _configuration;
         private readonly string employees, geolocationparameters, salesagents, single_employee;
-        private string jsonResponse, employeeterritorycount;
+        private string jsonResponse, employeeterritorycount, employeescount, salesrepselection;
 
         public EmployeeOperations(IConfiguration configuration)
         {
@@ -29,6 +29,8 @@ namespace GeofencingWebApi.Business
             salesagents = _configuration.GetSection("Endpoints").GetSection("salesagents").Value;
             single_employee = _configuration.GetSection("Endpoints").GetSection("single_employee").Value;
             employeeterritorycount = _configuration.GetSection("Endpoints").GetSection("employeeterritorycount").Value;
+            employeescount = _configuration.GetSection("Endpoints").GetSection("employeescount").Value;
+            salesrepselection = _configuration.GetSection("Endpoints").GetSection("salesrepselection").Value;
         }
 
         public List<EmployeeWorker> GetEmployees()
@@ -330,5 +332,81 @@ namespace GeofencingWebApi.Business
             return employeeTerritoryCountResponse;
         }
 
+        public async Task<long> GetEmployeesCount()
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + employeescount;
+            
+
+            long employeesCountResponse = 0;
+
+            try
+            {
+                var webRequest = WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
+
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    jsonResponse = reader.ReadToEnd();
+                    employeesCountResponse = JsonConvert.DeserializeObject<long>(jsonResponse);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return employeesCountResponse;
+        }
+
+        public async Task<int> GetSalesRepsCount()
+        {
+            var helper = new Helper(_configuration);
+            var authOperation = new AuthOperations(_configuration);
+
+            string token = authOperation.GetAuthToken();
+            string currentEnvironment = helper.GetEnvironmentUrl();
+            string url = currentEnvironment + salesrepselection;
+
+            List<TerritorySalesRep> distinctsalesreps = new List<TerritorySalesRep>();
+
+            try
+            {
+                var webRequest = WebRequest.Create(url);
+                if (webRequest != null)
+                {
+                    webRequest.Method = "GET";
+                    webRequest.Timeout = 120000;
+                    webRequest.Headers.Add("Authorization", "Bearer " + token);
+
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
+
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    jsonResponse = reader.ReadToEnd();
+                    var salesRepsListResponse = JsonConvert.DeserializeObject<SalesRepsResponse>(jsonResponse).value;
+                    distinctsalesreps = helper.GetDistinctSalesReps(salesRepsListResponse);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex.Message);
+            }
+
+            return distinctsalesreps.Count;
+        }
     }
 }

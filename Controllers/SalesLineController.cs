@@ -81,17 +81,15 @@ namespace GeofencingWebApi.Controllers
 
         [HttpGet]
         [Route("salesordernumber/{orderNumber}")]
-        public IActionResult GetSalesLinesBySalesOrderNumber(string orderNumber)
+        public async Task<IActionResult> GetSalesLinesBySalesOrderNumber(string orderNumber)
         {
-            var authOperation = new AuthOperations(_configuration);
-
             if (!ModelState.IsValid)
             {
                 return BadRequest("One of the required fields is missing!");
             }
 
             var salesLineOperations = new SalesLineOperations(_configuration);
-            var salesLineResponse = salesLineOperations.GetSalesLinesBySalesOrderNumber(orderNumber);
+            var salesLineResponse = await salesLineOperations.GetSalesLinesBySalesOrderNumber(orderNumber);
 
             return Ok(salesLineResponse);
         }

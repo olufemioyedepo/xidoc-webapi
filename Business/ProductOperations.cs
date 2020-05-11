@@ -7,7 +7,9 @@ using Newtonsoft.Json;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -109,7 +111,7 @@ namespace GeofencingWebApi.Business
             return productsResponseList.OrderBy( p => p.ProductNumber).ToList();
         }
 
-        public List<ReleasedProductItem> GetReleasedProducts()
+        public async Task<List<ReleasedProductItem>> GetReleasedProducts()
         {
             var helper = new Helper(_configuration);
             var authOperation = new AuthOperations(_configuration);
@@ -122,28 +124,32 @@ namespace GeofencingWebApi.Business
             string currentEnvironment = helper.GetEnvironmentUrl();
             string url = currentEnvironment + releasedproducts;
 
-            
-
             try
             {
-                var webRequest = System.Net.WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
+
                 if (webRequest != null)
                 {
                     webRequest.Method = "GET";
                     webRequest.Timeout = 120000;
                     webRequest.Headers.Add("Authorization", "Bearer " + token);
 
-                    using (System.IO.Stream s = webRequest.GetResponse().GetResponseStream())
-                    {
-                        using (System.IO.StreamReader sr = new System.IO.StreamReader(s))
-                        {
-                            var productsResponse = new ReleasedProductsResponse();
+                    WebResponse response = await webRequest.GetResponseAsync();
+                    Stream dataStream = response.GetResponseStream();
 
-                            jsonResponse = sr.ReadToEnd();
-                            productsResponse = JsonConvert.DeserializeObject<ReleasedProductsResponse>(jsonResponse);
-                            releasedProductsResponseList = productsResponse.value;
-                        }
-                    }
+                    StreamReader reader = new StreamReader(dataStream);
+
+                    var productsResponse = new ReleasedProductsResponse();
+                    jsonResponse = reader.ReadToEnd();
+
+                    productsResponse = JsonConvert.DeserializeObject<ReleasedProductsResponse>(jsonResponse);
+                    releasedProductsResponseList = productsResponse.value;
+
+                    response.Dispose();
+                    dataStream.Close();
+                    dataStream.Dispose();
+                    reader.Close();
+                    reader.Dispose();
                 }
             }
             catch (Exception ex)
@@ -154,7 +160,7 @@ namespace GeofencingWebApi.Business
             foreach (var item in releasedProductsResponseList)
             {
                 string itemName = String.Empty;
-                itemName = ProductOperations.GetProductName(products, item.ItemNumber);
+                itemName = GetProductName(products, item.ItemNumber);
                 item.ItemName = itemName;
             }
 
